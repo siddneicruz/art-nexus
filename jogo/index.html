@@ -2,98 +2,53 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="assets/leaflet/leaflet.css">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#171310">
+<meta name="theme-color" content="#14110d">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Art Nexus">
+<meta name="apple-mobile-web-app-title" content="Desafio da Arte">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="assets/icone-192.png">
 <link rel="icon" href="assets/icone-192.png">
-<title>ART NEXUS — Casa de Leilões &amp; Galeria Mundo</title>
-<link rel="stylesheet" href="css/style.css">
+<title>Desafio da Arte</title>
+<link rel="stylesheet" href="assets/leaflet/leaflet.css">
+<link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
 <div id="app">
-  <div id="hud">
-    <div class="brand">ART NEXUS <small>CASA DE LEILÕES &amp; GALERIA MUNDO</small></div>
-    <div id="hud-stats">
-      <div class="stat cash"><div class="lbl">Saldo</div><div class="val" id="hud-cash">€ 0</div></div>
-      <div class="stat rep"><div class="lbl">Reputação</div><div class="val" id="hud-rep">0</div><div class="stat-sub" id="hud-classe"></div></div>
-      <div class="hud-acoes"><button id="btn-config" title="Configurações e histórico de avisos">⚙</button><button id="btn-salvar" title="Salvar agora">💾</button><button id="btn-novo-jogo" title="Começar partida nova">↺</button></div>
-      <div class="stat know"><div class="lbl">Conhecimento</div><div class="val" id="hud-know">0</div></div>
-    </div>
-  </div>
-
-  <!-- PALCO: o mapa é o jogo; as telas abrem como painéis por cima dele -->
-  <div id="palco">
-    <div id="mundo"></div>
-    <div id="view-menu" class="view"></div>
-    <div id="view-acquisition" class="view"></div>
-    <div id="view-collection" class="view"></div>
-    <div id="view-exposicao" class="view"></div>
-    <div id="view-salas" class="view"></div>
-    <div id="view-banco" class="view"></div>
-    <div id="view-auction" class="view"></div>
-    <div id="view-quiz" class="view"></div>
-    <div id="view-estudo" class="view"></div>
-    <div id="view-agenda" class="view"></div>
-    <div id="view-carreira" class="view"></div>
-    <div id="view-config" class="view"></div>
-    <button id="gaveta-x" title="Voltar ao mapa (Esc)">✕ Mapa</button>
-  </div>
-
-  <!-- BARRA DE MENUS (embaixo) -->
-  <div id="nav">
-    <button data-view="mapa" class="nav-fixo active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span>Mapa</span></button>
-    <button data-view="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 20V9.5L12 5l7 4.5V20"/><path d="M9.5 20v-5h5v5"/><path d="M5 9.5h14"/></svg><span>Sede</span></button>
-    <button data-view="estudo" class="nav-fixo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v15H5.5C4.7 19 4 18.3 4 17.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v15h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg><span>Estudar</span></button>
-    <button data-view="acquisition" class="nav-fixo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.6" cy="8.6" r="1.3"/><circle cx="15.4" cy="15.4" r="1.3"/><circle cx="12" cy="12" r="1.3"/></svg><span>Aquisições</span></button>
-    <button data-view="collection" class="nav-fixo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M6 16.5 10 12l3 3 2-2.2 3 3.7"/><circle cx="9" cy="8.6" r="1.4"/></svg><span>Coleção</span></button>
-    <button data-view="exposicao"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.6 3.6 5.4 3.6 8.5S14.4 18.4 12 20.5c-2.4-2.1-3.6-5.4-3.6-8.5S9.6 6.1 12 3.5z"/></svg><span>Exposições</span></button>
-    <button data-view="salas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M4.5 20V8l7.5-4 7.5 4v12"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M4.5 8h15"/></svg><span>Salas</span></button>
-    <button data-view="auction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.8 3.6 20 8.8l-2.1 2.1-5.2-5.2z"/><path d="M11.6 6.8 4 14.4l2.1 2.1 7.6-7.6"/><path d="M3 20.5h9"/></svg><span>Leilões</span></button>
-    <button data-view="banco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M4.5 20v-8M9.5 20v-8M14.5 20v-8M19.5 20v-8"/><path d="M2.5 9.5 12 4l9.5 5.5z"/></svg><span>Banco</span></button>
-    <button data-view="quiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h9.5L19 7v13.5H6z"/><path d="M15.5 3.5V7H19"/><path d="M9 11h7M9 14.5h7M9 17.5h4"/></svg><span>Teste</span></button>
-    <button data-view="carreira"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M9 20h6M10 17h4"/></svg><span>Carreira</span></button>
-    <button data-view="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/><path d="M8 14l2.5 2.5L16 11"/></svg><span>Agenda</span></button>
-      <button id="nav-mais" type="button" aria-label="Mais telas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg><span>Mais</span></button>
-  </div>
+  <header id="topo">
+    <div class="brand">DESAFIO DA ARTE <small>teste o que você sabe sobre arte no mundo</small></div>
+    <div class="patente"><div class="pt-linha"><b id="pt-nome">Aprendiz</b><span id="pt-xp">0 XP</span></div><div class="barra"><i id="pt-barra"></i></div></div>
+  </header>
+  <div id="nivelbar"></div>
+  <main id="palco">
+    <section id="v-mapa" class="view ativa"><div id="mundo"></div><div id="aviso-mapa"></div></section>
+    <section id="v-vangogh" class="view"></section>
+    <section id="v-pintores" class="view"></section>
+    <section id="v-diario" class="view"></section>
+    <section id="v-perfil" class="view"></section>
+  </main>
+  <nav id="nav">
+    <button data-v="mapa" class="ativa"><span>🌍</span>Mapa</button>
+    <button data-v="vangogh"><span>🌻</span>Van Gogh</button>
+    <button data-v="pintores"><span>🎨</span>Pintores</button>
+    <button data-v="diario"><span>📅</span>Diário</button>
+    <button data-v="perfil"><span>🏅</span>Perfil</button>
+  </nav>
+  <div id="folha" class="folha"></div>
+  <div id="modal" class="modal"></div>
+  <div id="toast"></div>
+  <div id="tela-jogo"></div>
 </div>
-
-<!-- MODAL -->
-<div id="modal-overlay">
-  <div id="modal-card">
-    <button id="modal-close">✕</button>
-    <div id="modal-body"></div>
-  </div>
-</div>
-
 <script src="assets/leaflet/leaflet.js"></script>
-<script src="js/data.js"></script>
 <script src="js/artworks-data.js"></script>
-<script src="js/proveniencia.js"></script>
-<script src="js/audio.js"></script>
-<script src="js/geo-data.js"></script>
 <script src="js/mundo-data.js"></script>
-<script src="js/salas.js"></script>
-<script src="js/mapa.js"></script>
+<script src="js/audio.js"></script>
 <script src="js/supabase-config.js"></script>
-<script src="js/supabase-obras.js"></script>
-<script src="js/config.js"></script>
-<script src="js/eventos.js"></script>
-<script src="js/agenda-planner.js"></script>
-<script src="js/musica.js"></script>
-<script src="js/sala-visao.js"></script>
-<script src="js/auction.js"></script>
-<script src="js/quiz.js"></script>
-<script src="js/estudo.js"></script>
-<script src="js/banco.js"></script>
-<script src="js/hub.js"></script>
-<script src="js/save.js"></script>
+<script src="js/dados.js"></script>
+<script src="js/perguntas.js"></script>
+<script src="js/vangogh.js"></script>
+<script src="js/progresso.js"></script>
+<script src="js/jogo.js"></script>
 <script src="js/app.js"></script>
-<script src="js/carreira.js"></script>
 </body>
 </html>

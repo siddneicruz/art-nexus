@@ -1,6 +1,6 @@
 {
   "appId": "com.artnexus.jogo",
-  "appName": "Art Nexus",
+  "appName": "Desafio da Arte",
   "webDir": "www",
   "backgroundColor": "#171310",
   "android": { "allowMixedContent": false }
