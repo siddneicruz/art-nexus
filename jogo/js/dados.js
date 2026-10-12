@@ -59,6 +59,13 @@ const Acervo = {
     return s;
   },
 
+  // "01_The Starry Night.jpg" / "the-starry-night-68.jpg" -> "the starry night"
+  chaveArquivo(ref){
+    const base = String(ref||"").split("/").pop().replace(/\.[a-z0-9]+$/i,"");
+    return this.norm(base).replace(/^\d+\s+/,"").replace(/\s+\d+$/,"");
+  },
+  chavesDe(titulo, imagem){ return [this.norm(titulo), this.chaveArquivo(imagem)].filter(k=>k.length>3); },
+
   fotoLocal(o){ return (typeof IMG_EMBUTIDAS !== "undefined" && IMG_EMBUTIDAS[o.imagem]) || o.imagem; },
 
   urlDoBucket(ref){
@@ -90,13 +97,14 @@ const Acervo = {
 
   // obras da nuvem (linhas da tabela)
   incorporarNuvem(linhas){
-    const jaTem = new Set(this.obras.map(o=>this.norm(o.artista)+"|"+this.norm(o.titulo)));
+    const jaTem = new Set();
+    this.obras.forEach(o=>this.chavesDe(o.titulo, o.imagem).forEach(k=>jaTem.add(this.norm(o.artista)+"|"+k)));
     let n = 0;
     (linhas||[]).forEach(r=>{
-      if(!r || !r.id || !r.artista || !r.imagem || this.porId[r.id]) return;
-      const chave = this.norm(r.artista)+"|"+this.norm(r.titulo);
-      if(jaTem.has(chave)) return;
-      jaTem.add(chave);
+      if(!r || !r.id || !r.artista || !r.imagem || r.duplicada || this.porId[r.id]) return;
+      const chaves = this.chavesDe(r.titulo, r.imagem).map(k=>this.norm(r.artista)+"|"+k);
+      if(chaves.some(k=>jaTem.has(k))) return;     // mesma obra já presente (título em outro idioma, arquivo repetido...)
+      chaves.forEach(k=>jaTem.add(k));
       this.adicionar({
         id:String(r.id), titulo:this.tituloLimpo(r.titulo, r.artista) || (r.titulo||""), tituloOk:!!this.tituloLimpo(r.titulo, r.artista),
         artista:r.artista, pais:r.pais, movimento:r.movimento || "", ano:null, anoPreciso:false, anoTxt:"",
@@ -115,14 +123,14 @@ const Acervo = {
     let linhas = null;
     try{
       const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), 12000);
-      const r = await fetch(`${c.url}/rest/v1/obras?select=id,titulo,artista,pais,tier,movimento,imagem&limit=5000`,
+      const r = await fetch(`${c.url}/rest/v1/obras?select=id,titulo,artista,pais,tier,movimento,imagem,duplicada&duplicada=eq.false&limit=5000`,
         { headers:{ apikey:c.anonKey, Authorization:`Bearer ${c.anonKey}` }, signal:ctl.signal });
       clearTimeout(t);
       if(!r.ok) throw new Error("HTTP "+r.status);
       linhas = await r.json();
-      try{ localStorage.setItem("artnexus_nuvem_v2", JSON.stringify(linhas)); }catch(e){}
+      try{ localStorage.setItem("artnexus_nuvem_v3", JSON.stringify(linhas)); }catch(e){}
     }catch(e){
-      try{ linhas = JSON.parse(localStorage.getItem("artnexus_nuvem_v2")); }catch(_){}
+      try{ linhas = JSON.parse(localStorage.getItem("artnexus_nuvem_v3")); }catch(_){}
     }
     return Array.isArray(linhas) ? this.incorporarNuvem(linhas) : 0;
   },

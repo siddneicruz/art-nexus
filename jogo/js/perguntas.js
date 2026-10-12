@@ -42,18 +42,14 @@ const Perguntas = {
 
   // escolhe as obras da rodada: metade (ou mais) curadas, para haver variedade de perguntas
   selecionar(esc, qtd, rnd=Math.random){
-    const pool = this.obrasDo(esc);
+    let pool = this.obrasDo(esc);
+    // com um pintor escolhido só entram obras com pergunta possível (não perguntamos o autor)
+    if(esc.tipo==="pintor") pool = pool.filter(w=>w.rica || w.tituloOk);
     const mistura = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
     const ricas = mistura(pool.filter(w=>w.rica)), outras = mistura(pool.filter(w=>!w.rica));
     const nRicas = Math.min(ricas.length, Math.ceil(qtd*0.65));
     let sel = [...ricas.slice(0,nRicas), ...outras.slice(0, qtd-nRicas)];
     if(sel.length < qtd) sel = [...sel, ...ricas.slice(nRicas, nRicas + qtd - sel.length)];
-    if(esc.tipo==="pintor"){
-      // treino de identificação: acrescenta "sósias" de outros artistas do mesmo movimento
-      const movs = new Set(pool.map(w=>w.movimento).filter(Boolean));
-      const sosias = mistura(Acervo.obras.filter(w=>w.artista!==esc.valor && movs.has(w.movimento)));
-      sel = [...sel, ...sosias.slice(0, Math.max(0, Math.ceil(qtd*0.3)))];
-    }
     return mistura(sel).slice(0, qtd);
   },
 
@@ -71,8 +67,10 @@ const Perguntas = {
 
   montar(o, esc, nivel, contagem, rnd=Math.random){
     const pesos = { ...PESOS[nivel] };
-    if(esc.tipo!=="pintor") delete pesos.edeste;
-    if(esc.tipo==="pintor"){ pesos.autor = 0; pesos.edeste = 5; }
+    delete pesos.edeste;    // "Esta obra é de X?" também pergunta o autor: fora
+    if(esc.tipo==="pintor"){   // o jogador já escolheu o artista: nada de "quem pintou?"
+      pesos.autor = 0; pesos.zoom = 0; pesos.movimento = 0; pesos.zoomtitulo = 3;
+    }
     // evita repetir muito o mesmo tipo na rodada
     const tipos = Object.keys(pesos).filter(t=>pesos[t]>0 && (contagem[t]||0) < 4);
     let bag = [];
@@ -105,6 +103,13 @@ const Perguntas = {
         const mesmo = todas.filter(w=>w.artista===o.artista && w.id!==o.id && (w.rica || w.tituloOk)).map(w=>w.titulo);
         const outros = todas.filter(w=>(w.rica || w.tituloOk) && w.id!==o.id).map(w=>w.titulo);
         return mk("Qual é o título desta obra?", o.titulo, distratores(o.titulo, outros, n, mesmo), { imagem:true });
+      }
+      case "zoomtitulo": {
+        if(o.nuvem && !o.tituloOk) return null;
+        const mesmo = todas.filter(w=>w.artista===o.artista && w.id!==o.id && (w.rica || w.tituloOk)).map(w=>w.titulo);
+        const outros = todas.filter(w=>(w.rica || w.tituloOk) && w.id!==o.id).map(w=>w.titulo);
+        return mk("Qual é o título desta obra? (veja só um detalhe)", o.titulo, distratores(o.titulo, outros, n, mesmo),
+          { imagem:true, longo:true, zoom:{ x:20+Math.random()*60, y:20+Math.random()*60 } });
       }
       case "movimento": {
         if(!o.movimento) return null;
