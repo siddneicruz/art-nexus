@@ -72,7 +72,7 @@ const Musica = {
   atual(){ return PECAS[this.indice % PECAS.length]; },
 
   tocar(indice){
-    this.parar();
+    this.parar(); this.voltas = 0;
     if(typeof indice === "number") this.indice = indice;
     this.tocando = true;
     if(this.mudo) return;
@@ -98,36 +98,48 @@ const Musica = {
   sintetizar(peca){
     const ctx = this.contexto(); if(!ctx) return;
     if(ctx.resume) ctx.resume();
-    const batida = 60 / peca.bpm;
-    let t = ctx.currentTime + 0.08, total = 0;
+    const batida = 60 / peca.bpm, inicio = ctx.currentTime + 0.08;
+    let t = inicio, total = 0;
     peca.notas.forEach(([n, dur])=>{
       const d = dur * batida;
       if(n !== "-") this.nota(freqNota(n), t, d, peca.timbre);
       t += d; total += d;
     });
-    // repete a peça, com um respiro entre as voltas
-    this.timer = setTimeout(()=>{ if(this.tocando && !this.mudo && !this.audio) this.sintetizar(peca); }, (total + 0.6) * 1000);
+    if(peca.acomp){ let ta = inicio; peca.acomp.forEach(([n, dur])=>{ const d = dur * batida; if(n !== "-" && ta < inicio + total) this.nota(freqNota(n), ta, d, "cordas", .55); ta += d; }); }
+    // toca a peça duas vezes e passa para a próxima do repertório
+    this.voltas = (this.voltas || 0) + 1;
+    this.timer = setTimeout(()=>{
+      if(!this.tocando || this.mudo || this.audio) return;
+      if(this.voltas >= 2){ this.voltas = 0; this.tocar((this.indice + 1) % PECAS.length); }
+      else this.sintetizar(peca);
+    }, (total + 0.8) * 1000);
   },
 
-  nota(f, t, d, timbre){
+  nota(f, t, d, timbre, vol=1){
     const ctx = this.ctx;
-    const tons = timbre === "orquestra" ? [[f,.5],[f/2,.35],[f*2,.12]]
-               : timbre === "metais" ? [[f,.5],[f/2,.3]]
-               : timbre === "cravo" ? [[f,.45],[f*2,.12]]
-               : [[f,.45],[f/2,.18]];
-    tons.forEach(([fr, vol])=>{
+    const T = {
+      cordas:   { tipo:"sawtooth", tons:[[1,.45],[.5,.18]], lp:1400, ataque:.06, sustenta:true },
+      orquestra:{ tipo:"sawtooth", tons:[[1,.5],[.5,.35],[2,.12]], lp:1400, ataque:.03, sustenta:true },
+      metais:   { tipo:"sawtooth", tons:[[1,.5],[.5,.3]], lp:900, abre:2200, ataque:.03, sustenta:true },
+      cravo:    { tipo:"square", tons:[[1,.45],[2,.12]], lp:2400, ataque:.005, queda:.5 },
+      piano:    { tipo:"triangle", tons:[[1,.55],[2,.16],[3,.06]], lp:3200, ataque:.008, queda:1.6 },
+      harpa:    { tipo:"triangle", tons:[[1,.5],[2,.1]], lp:3600, ataque:.004, queda:1.4 },
+      celesta:  { tipo:"sine", tons:[[1,.45],[4,.12]], lp:5000, ataque:.004, queda:1.2 },
+      flauta:   { tipo:"sine", tons:[[1,.5],[2,.1]], lp:2800, ataque:.08, sustenta:true },
+    }[timbre] || { tipo:"sawtooth", tons:[[1,.45]], lp:1400, ataque:.05, sustenta:true };
+    const fim = T.sustenta ? d * .95 : Math.max(Math.min(d * 1.5, T.queda), .2);
+    T.tons.forEach(([m, v0])=>{
+      const vv = v0 * vol;
       const o = ctx.createOscillator(), g = ctx.createGain(), fil = ctx.createBiquadFilter();
-      o.type = timbre === "cravo" ? "square" : "sawtooth";
-      o.frequency.setValueAtTime(fr, t);
+      o.type = T.tipo;
+      o.frequency.setValueAtTime(f * m, t);
       fil.type = "lowpass";
-      fil.frequency.setValueAtTime(timbre === "metais" ? 900 : timbre === "cravo" ? 2400 : 1400, t);
-      if(timbre === "metais") fil.frequency.linearRampToValueAtTime(2200, t + Math.min(d, .25));
-      const ataque = timbre === "cravo" ? .005 : timbre === "cordas" ? .06 : .03;
-      const fim = timbre === "cravo" ? Math.min(d, .5) : d * .95;
+      fil.frequency.setValueAtTime(T.lp, t);
+      if(T.abre) fil.frequency.linearRampToValueAtTime(T.abre, t + Math.min(d, .25));
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.linearRampToValueAtTime(vol, t + ataque);
-      if(timbre === "cravo") g.gain.exponentialRampToValueAtTime(0.0001, t + fim);
-      else { g.gain.setValueAtTime(vol * .85, t + Math.max(ataque, fim - .08)); g.gain.linearRampToValueAtTime(0.0001, t + fim); }
+      g.gain.linearRampToValueAtTime(vv, t + T.ataque);
+      if(T.sustenta){ g.gain.setValueAtTime(vv * .85, t + Math.max(T.ataque, fim - .08)); g.gain.linearRampToValueAtTime(0.0001, t + fim); }
+      else g.gain.exponentialRampToValueAtTime(0.0001, t + fim);
       o.connect(fil); fil.connect(g); g.connect(this.saida);
       o.start(t); o.stop(t + fim + .05);
       this.fontes.push(o);
