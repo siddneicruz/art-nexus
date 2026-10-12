@@ -17,6 +17,8 @@ const PAISES = {
   "Reino Unido": { flag:"🇬🇧", lat:54.0,  lng:-2.5 },
   "Áustria":     { flag:"🇦🇹", lat:47.6,  lng:14.1 },
   "Brasil":      { flag:"🇧🇷", lat:-14.2, lng:-51.9 },
+  "México":      { flag:"🇲🇽", lat:23.6,  lng:-102.5 },
+  "Estados Unidos": { flag:"🇺🇸", lat:39.8, lng:-98.6 },
 };
 
 const Acervo = {
@@ -106,10 +108,12 @@ const Acervo = {
       const chaves = this.chavesDe(r.titulo, r.imagem).map(k=>this.norm(r.artista)+"|"+k);
       if(chaves.some(k=>jaTem.has(k))) return;     // mesma obra já presente (título em outro idioma, arquivo repetido...)
       chaves.forEach(k=>jaTem.add(k));
+      // fichas completas (ano + técnica vindos dos .txt) entram em todos os tipos de pergunta
+      const a = this.anoDe(r.data_obra), tec = String(r.tecnica||"").trim(), rica = !!(a.ano && tec);
       this.adicionar({
         id:String(r.id), titulo:this.tituloLimpo(r.titulo, r.artista) || (r.titulo||""), tituloOk:!!this.tituloLimpo(r.titulo, r.artista),
-        artista:r.artista, pais:r.pais, movimento:r.movimento || "", ano:null, anoPreciso:false, anoTxt:"",
-        tecnica:"", cidade:"", localTxt:"", museu:"", fatos:[], imagem:this.urlDoBucket(r.imagem), tier:r.tier || 3, rica:false, nuvem:true,
+        artista:r.artista, pais:r.pais, movimento:r.movimento || "", ano:a.ano, anoPreciso:a.preciso, anoTxt:r.data_obra || "",
+        tecnica:tec, cidade:this.cidadeDe(r.local), localTxt:r.local || "", museu:this.museuLimpo(r.museu), fatos:[], imagem:this.urlDoBucket(r.imagem), tier:r.tier || 3, rica, nuvem:true,
       });
       n++;
     });
@@ -126,16 +130,16 @@ const Acervo = {
       linhas = [];
       for(let ini=0; ini<20000; ini+=1000){
         const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), 15000);
-        const r = await fetch(`${c.url}/rest/v1/obras?select=id,titulo,artista,pais,tier,movimento,imagem,duplicada&duplicada=eq.false&order=id.asc`,
+        const r = await fetch(`${c.url}/rest/v1/obras?select=id,titulo,artista,pais,tier,movimento,imagem,duplicada,data_obra,tecnica,local,museu&duplicada=eq.false&order=id.asc`,
           { headers:{ apikey:c.anonKey, Authorization:`Bearer ${c.anonKey}`, Range:`${ini}-${ini+999}`, "Range-Unit":"items" }, signal:ctl.signal });
         clearTimeout(t);
         if(!r.ok) throw new Error("HTTP "+r.status);
         const pag = await r.json(); linhas.push(...pag);
         if(pag.length < 1000) break;
       }
-      try{ localStorage.setItem("artnexus_nuvem_v5", JSON.stringify(linhas)); }catch(e){}
+      try{ localStorage.setItem("artnexus_nuvem_v6", JSON.stringify(linhas)); }catch(e){}
     }catch(e){
-      try{ linhas = JSON.parse(localStorage.getItem("artnexus_nuvem_v5")); }catch(_){}
+      try{ linhas = JSON.parse(localStorage.getItem("artnexus_nuvem_v6")); }catch(_){}
     }
     return Array.isArray(linhas) ? this.incorporarNuvem(linhas) : 0;
   },

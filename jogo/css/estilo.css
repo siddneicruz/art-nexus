@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap');
 :root{
-  --ink:#14110d; --ink-deep:#0b0906; --panel:#1d1812; --panel-2:#241d15; --line:rgba(201,161,59,.22);
-  --parchment:#efe6d3; --dim:#b9ae95; --gold:#c9a13b; --gold-2:#e8c766; --sage:#7c9473; --rose:#c15a5a;
+  --ink:#100e0b; --ink-deep:#080706; --panel:#1a1611; --panel-2:#241e16; --line:rgba(240,207,122,.14);
+  --parchment:#efe6d3; --dim:#b9ae95; --gold:#d6aa47; --gold-2:#f2d27e; --sage:#7c9473; --rose:#c15a5a;
   --serif:'Cormorant Garamond',Georgia,serif; --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -161,3 +161,90 @@ blockquote.intro-frase{font-family:var(--serif);font-style:italic;font-size:19px
 .jg-seg{font-weight:400;opacity:.8;margin-left:6px}
 .jg-img .revbox{position:relative;line-height:0;max-width:100%;max-height:100%}
 .jg-img .revbox img{display:block;width:auto;height:auto;max-width:100%;max-height:min(34vh,300px)}
+
+
+/* =====================================================================
+   VISUAL 2.0 — galeria moderna: vidro fosco, cantos generosos, ícones em traço
+   ===================================================================== */
+:root{ --raio:18px; --sombra:0 10px 30px rgba(0,0,0,.45); --vidro:rgba(26,22,17,.72); }
+body{background:radial-gradient(120% 80% at 50% -10%, #1d1710 0%, var(--ink-deep) 60%)}
+#app{background:linear-gradient(180deg,#120f0b 0%,var(--ink) 100%);box-shadow:0 0 60px #000}
+svg{width:1em;height:1em;display:block}
+/* topo */
+#topo{background:linear-gradient(180deg,#0b0906,rgba(11,9,6,.92));border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 16px 10px}
+.brand{display:flex;align-items:center;gap:10px;font-size:15px;letter-spacing:.2em}
+.brand .logo{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#1a1409;background:linear-gradient(145deg,var(--gold-2),var(--gold));box-shadow:0 4px 14px rgba(214,170,71,.35)}
+.brand-t{line-height:1.15}
+.brand small{letter-spacing:.01em;font-size:10.5px;margin-top:2px;text-transform:none}
+.patente{margin-top:9px}.pt-linha{font-size:12px}
+.barra{height:7px;background:rgba(255,255,255,.07);border-radius:99px}
+.barra i{border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold-2));box-shadow:0 0 10px rgba(242,210,126,.35)}
+/* música */
+#sv-musica{margin-top:8px;gap:7px}
+#sv-musica button{width:32px;height:30px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--gold-2);font-size:16px;display:flex;align-items:center;justify-content:center}
+#sv-musica button:active{background:rgba(255,255,255,.12)}
+#mu-mudo .i-off{display:none}#mu-mudo.mudo .i-off{display:flex}#mu-mudo.mudo .i-on{display:none}#mu-mudo.mudo{color:var(--dim)}
+#mu-mudo span{display:flex}
+/* níveis */
+#nivelbar{padding:10px 14px;background:transparent;border-bottom:none;scrollbar-width:none}#nivelbar::-webkit-scrollbar{display:none}
+.chip{padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:12.5px;transition:.2s}
+.chip.on{background:linear-gradient(135deg,var(--gold-2),var(--gold));box-shadow:0 4px 14px rgba(214,170,71,.3)}
+/* navegação flutuante */
+#nav{border:none;background:transparent;padding:0 12px calc(env(safe-area-inset-bottom) + 10px)}
+#nav::before{content:"";position:absolute}
+#nav{position:relative;gap:2px}
+#nav button{border-radius:16px;padding:9px 2px 8px;font-size:10.5px;font-weight:500;letter-spacing:.02em;transition:.2s;color:#8d836c}
+#nav button span{font-size:22px;display:flex;transition:transform .2s}
+#nav button.ativa{color:var(--gold-2);background:rgba(242,210,126,.1)}
+#nav button.ativa span{transform:translateY(-1px)}
+#nav{background:var(--vidro);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);margin:0 10px calc(env(safe-area-inset-bottom) + 8px);padding:5px;border-radius:22px;border:1px solid var(--line);box-shadow:var(--sombra)}
+/* títulos e cartões */
+h2.sec{font-size:30px;letter-spacing:.01em;margin:4px 0 6px}
+p.sub{font-size:13.5px}
+.card,.cap,.medalha,.grade div{border-radius:var(--raio);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));border:1px solid var(--line)}
+.btn{border-radius:14px;padding:13px 20px;transition:.15s}.btn:active{transform:scale(.98)}
+.btn.ouro{background:linear-gradient(135deg,var(--gold-2),var(--gold));box-shadow:0 6px 18px rgba(214,170,71,.28)}
+.busca{border-radius:14px;background:rgba(255,255,255,.04);padding:13px 14px;margin-bottom:14px}
+.busca:focus{outline:none;border-color:var(--gold)}
+.vg-heroi{border-radius:22px;box-shadow:var(--sombra);position:relative;overflow:hidden}
+.cap .ic{background:rgba(255,255,255,.06)}
+.folha,.modal .caixa{border-radius:26px 26px 0 0;background:#17130e;border-color:var(--line);border-top-color:rgba(242,210,126,.5)}
+.jg-op{border-radius:16px;background:rgba(255,255,255,.04);padding:15px 10px}
+.jg-img{border-radius:18px}
+.jg-q{font-size:25px}
+#toast{border-radius:14px;background:var(--vidro);backdrop-filter:blur(10px)}
+
+/* ---------- galeria de pintores ---------- */
+.galeria{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 12px}
+@media(min-width:520px){.galeria{grid-template-columns:repeat(3,1fr)}}
+.quadro{display:flex;flex-direction:column;text-align:center;gap:8px;padding:0;width:100%;transition:transform .15s}
+.quadro:active{transform:scale(.97)}
+.quadro.vazio{opacity:.72}
+.moldura{position:relative;padding:7px;border-radius:14px;background:linear-gradient(145deg,#f2d27e 0%,#a9812c 45%,#e4bd62 100%);box-shadow:0 10px 24px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.25)}
+.moldura::after{content:"";position:absolute;inset:7px;border-radius:7px;box-shadow:inset 0 0 14px rgba(0,0,0,.55);pointer-events:none}
+.ret{position:relative;aspect-ratio:4/5;border-radius:7px;overflow:hidden;background:linear-gradient(160deg,#2b2318,#15110c)}
+.ret img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;filter:sepia(.18) contrast(1.03)}
+.ret .mono{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:44px;font-weight:700;color:var(--gold-2);opacity:.85;letter-spacing:.04em}
+.placa{margin:0 auto;padding:6px 12px;border-radius:8px;background:linear-gradient(180deg,#2a2217,#1a150e);border:1px solid rgba(242,210,126,.3);min-width:80%;max-width:100%}
+.placa b{display:block;font-family:var(--serif);font-size:15.5px;line-height:1.15;color:var(--gold-2);font-weight:700}
+.placa small{display:block;font-size:10.5px;color:var(--dim);margin-top:2px}
+.evolucao{padding:0 6px}
+.evolucao .barra{height:6px}
+.evolucao small{display:block;margin-top:4px;font-size:10.5px;color:var(--dim)}
+/* biografia */
+.pintor-bio{padding:18px}
+.pb-topo{display:flex;gap:14px;align-items:center}
+.moldura.grande{width:118px;flex:0 0 auto}
+.pintor-bio h3{font-size:27px;margin-top:0;line-height:1.1}
+.tag{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:99px;font-size:11px;background:rgba(242,210,126,.12);color:var(--gold-2);border:1px solid var(--line)}
+.pb-bio{font-size:14.5px;line-height:1.6;margin-top:14px;color:#e6dcc6}
+.evolucao.grande{margin-top:14px;padding:0}.evolucao.grande .barra{height:9px}.evolucao.grande small{font-size:12px}
+.pb-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.pb-btns .btn{flex:1 1 140px}
+.credito{font-size:10.5px;color:var(--dim);margin-top:12px;opacity:.7;text-align:center}
+#modal .pintor-bio .album{grid-template-columns:repeat(3,1fr)}
+#modal .pintor-bio .album img{aspect-ratio:1;border-radius:12px}
+
+.hero-topo{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.hero-topo h2{margin:0}
+.hero-ret.moldura{width:56px;flex:0 0 auto;padding:3px;border-radius:12px}
+.hero-ret .ret{aspect-ratio:1;border-radius:9px}.hero-ret .ret .mono{font-size:20px}.hero-ret.moldura::after{inset:3px;border-radius:9px}

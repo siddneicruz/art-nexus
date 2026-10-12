@@ -63,6 +63,12 @@ const Perguntas = {
     // com um pintor escolhido só entram obras com pergunta possível (não perguntamos o autor)
     if(esc.tipo==="pintor") pool = pool.filter(w=>w.rica || w.tituloOk);
     const mistura = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+    // acervos grandes de um único artista (ex.: Dalí, mais de mil obras) não podem dominar rodadas de país ou mistas
+    if(esc.tipo!=="pintor"){
+      const grupos = {}; pool.forEach(w=>{ (grupos[w.artista] = grupos[w.artista] || []).push(w); });
+      const nG = Object.keys(grupos).length, K = Math.max(6, Math.ceil(qtd*2/Math.max(1,nG)));
+      pool = Object.values(grupos).flatMap(g=>mistura(g).slice(0,K));
+    }
     const ricas = mistura(pool.filter(w=>w.rica)), outras = mistura(pool.filter(w=>!w.rica));
     const nRicas = Math.min(ricas.length, Math.ceil(qtd*0.65));
     let sel = [...ricas.slice(0,nRicas), ...outras.slice(0, qtd-nRicas)];

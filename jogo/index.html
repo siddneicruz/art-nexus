@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#14110d">
+<meta name="theme-color" content="#0f0d0a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Desafio da Arte">
@@ -16,8 +16,8 @@
 <body>
 <div id="app">
   <header id="topo">
-    <div class="brand">DESAFIO DA ARTE <small>teste o que você sabe sobre arte no mundo</small></div>
-    <div id="sv-musica"><span class="mu-titulo">♪ toque para ouvir</span><button id="mu-ant" title="Música anterior">⏮</button><button id="mu-prox" title="Próxima música">⏭</button><button id="mu-mudo" title="Ligar/desligar música">🔊</button></div>
+    <div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 16l3.5-4.5 2.5 3 2-2.5 2 4"/><circle cx="9" cy="8.5" r="1.2"/></svg></span><div class="brand-t">DESAFIO DA ARTE<small>teste o que você sabe sobre arte no mundo</small></div></div>
+    <div id="sv-musica"><span class="mu-titulo">♪ toque para ouvir</span><button id="mu-ant" title="Música anterior" aria-label="Música anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 20 9 12l10-8z"/><path d="M5 19V5"/></svg></button><button id="mu-prox" title="Próxima música" aria-label="Próxima música"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4l10 8-10 8z"/><path d="M19 5v14"/></svg></button><button id="mu-mudo" title="Ligar/desligar música" aria-label="Ligar ou desligar a música"><span class="i-on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg></span><span class="i-off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg></span></button></div>
     <div class="patente"><div class="pt-linha"><b id="pt-nome">Aprendiz</b><span id="pt-xp">0 XP</span></div><div class="barra"><i id="pt-barra"></i></div></div>
   </header>
   <div id="nivelbar"></div>
@@ -29,11 +29,11 @@
     <section id="v-perfil" class="view"></section>
   </main>
   <nav id="nav">
-    <button data-v="mapa" class="ativa"><span>🌍</span>Mapa</button>
-    <button data-v="mestres"><span>🖌️</span>Mestres</button>
-    <button data-v="pintores"><span>🎨</span>Pintores</button>
-    <button data-v="diario"><span>📅</span>Diário</button>
-    <button data-v="perfil"><span>🏅</span>Perfil</button>
+    <button data-v="mapa" class="ativa"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg></span>Mapa</button>
+    <button data-v="mestres"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg></span>Mestres</button>
+    <button data-v="pintores"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="10" r="3"/><path d="M6.5 19c1-3 3-4.5 5.5-4.5s4.5 1.5 5.5 4.5"/></svg></span>Pintores</button>
+    <button data-v="diario"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>Diário</button>
+    <button data-v="perfil"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5 17 22l-5-3-5 3 1.5-8.5"/></svg></span>Perfil</button>
   </nav>
   <div id="folha" class="folha"></div>
   <div id="modal" class="modal"></div>
@@ -48,6 +48,7 @@
 <script src="js/musica-pecas.js"></script>
 <script src="js/musica-faixas.js"></script>
 <script src="js/supabase-config.js"></script>
+<script src="js/pintores-dados.js"></script>
 <script src="js/traducoes.js"></script>
 <script src="js/dados.js"></script>
 <script src="js/perguntas.js"></script>

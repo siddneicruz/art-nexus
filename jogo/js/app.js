@@ -50,8 +50,25 @@ function abrirFicha(o){
     ${outras.length ? `<div class="cn-tit" style="margin-top:10px">🎨 Mais de ${o.artista}</div><div class="album" id="ficha-outras">${outras.map(x=>`<img src="${Acervo.imgSrc(x)}" data-id="${x.id}" alt="" loading="lazy">`).join("")}</div>` : ""}
     <div class="jg-fb-btns" style="margin-top:12px"><button class="btn ouro" id="fecha-ficha">Fechar</button></div></div>`;
   m.classList.add("aberto");
+  carregarHistoria(o, m);
   m.onclick = e => { if(e.target===m || e.target.id==="fecha-ficha") m.classList.remove("aberto"); };
   m.querySelectorAll("#ficha-outras img").forEach(i=>i.addEventListener("click", ()=>{ abrirFicha(Acervo.porId[i.dataset.id]); m.querySelector(".caixa").scrollTop = 0; }));
+}
+
+/* obras da nuvem: o texto da ficha (história/descrição) é buscado só quando a ficha abre */
+const _historias = {};
+async function carregarHistoria(o, m){
+  if(!o.nuvem || (o.fatos && o.fatos.length)) return;
+  const c = SUPABASE_CONFIG; if(!c || !c.url) return;
+  const poe = txt=>{ if(!txt || m.dataset.ficha !== o.id) return; const el = m.querySelector(".art"); if(el && !m.querySelector(".hist-nuvem")) el.insertAdjacentHTML("afterend", `<p class="hist-nuvem">${txt.replace(/</g,"&lt;")}</p>`); };
+  m.dataset.ficha = o.id;
+  if(_historias[o.id] !== undefined) return poe(_historias[o.id]);
+  try{
+    const r = await fetch(`${c.url}/rest/v1/obras?id=eq.${encodeURIComponent(o.id)}&select=historia`, { headers:{ apikey:c.anonKey, Authorization:`Bearer ${c.anonKey}` } });
+    const j = await r.json(); let h = (j[0] && j[0].historia) || "";
+    if(/^Obra de .* \(.*\)\.$/.test(h)) h = "";
+    _historias[o.id] = h; poe(h);
+  }catch(e){ _historias[o.id] = ""; }
 }
 
 /* ---------------- navegação ---------------- */
@@ -119,19 +136,64 @@ function abrirPais(nome){
 
 /* ---------------- pintores ---------------- */
 let filtroPintor = "";
+const RETRATO_PNG = { "aleijadinho":1, "leonardo-da-vinci":1 };
+function monograma(nome){ return nome.split(/[\s,-]+/).filter(p=>/^[A-ZÀ-Ú]/.test(p)).slice(0,2).map(p=>p[0]).join("") || nome[0]; }
+function retratoHtml(nome){
+  const inf = PINTORES_INFO[nome];
+  const img = inf ? `<img src="${Acervo.urlDoBucket("sb:_retratos/"+inf.slug+(RETRATO_PNG[inf.slug]?".png":".jpg"))}" alt="Retrato de ${escapeAttr(nome)}" loading="lazy">` : "";
+  return `<div class="ret"><span class="mono">${monograma(nome)}</span>${img}</div>`;
+}
+function listaPintores(){
+  const m = {};
+  Acervo.obras.forEach(o=>{ (m[o.artista] = m[o.artista] || { nome:o.artista, pais:o.pais, obras:[] }).obras.push(o); });
+  Object.keys(PINTORES_INFO).forEach(n=>{ if(!m[n]) m[n] = { nome:n, pais:"", obras:[] }; });
+  return Object.values(m).filter(a=>a.obras.length>=1 || PINTORES_INFO[a.nome]).sort((a,b)=>(b.obras.length>0)-(a.obras.length>0) || b.obras.length-a.obras.length || a.nome.localeCompare(b.nome));
+}
 function renderPintores(){
   const el = $("v-pintores");
-  const mapaA = {};
-  Acervo.obras.forEach(o=>{ (mapaA[o.artista] = mapaA[o.artista] || { nome:o.artista, pais:o.pais, obras:[] }).obras.push(o); });
-  let lista = Object.values(mapaA).filter(a=>a.obras.length>=3).sort((a,b)=>b.obras.length-a.obras.length);
+  let lista = listaPintores();
   const q = Acervo.norm(filtroPintor);
   if(q) lista = lista.filter(a=>Acervo.norm(a.nome).includes(q));
-  el.innerHTML = `<h2 class="sec">Pintores</h2><p class="sub">Escolha um artista e treine para reconhecer as obras dele — e as que parecem ser dele, mas não são.</p>
+  const todas = listaPintores(), jogaveis = todas.filter(a=>a.obras.length>=3).length;
+  el.innerHTML = `<h2 class="sec">Pintores</h2><p class="sub">${jogaveis} artistas para conhecer. Toque no quadro para ler a biografia e seguir o jogo.</p>
     <input class="busca" id="busca-pintor" placeholder="Buscar pintor..." value="${escapeAttr(filtroPintor)}">
-    ${lista.map((a,i)=>`<button class="pintor" data-i="${i}"><img src="${Acervo.imgSrc(a.obras[0])}" alt="" loading="lazy"><div style="flex:1"><div class="nm">${PAISES[a.pais].flag} ${a.nome}</div><small>${a.obras.length} obras · domínio ${Prog.dominioPintor(a.nome)}%</small><div class="barra"><i style="width:${Prog.dominioPintor(a.nome)}%"></i></div></div></button>`).join("") || `<p class="sub">Nenhum pintor encontrado.</p>`}`;
+    <div class="galeria">${lista.map((a,i)=>{
+      const inf = PINTORES_INFO[a.nome] || {}, dom = Prog.dominioPintor(a.nome), vistas = a.obras.filter(o=>Prog.P.vistas[o.id]).length;
+      return `<button class="quadro ${a.obras.length?"":"vazio"}" data-n="${escapeAttr(a.nome)}">
+        <div class="moldura">${retratoHtml(a.nome)}</div>
+        <div class="placa"><b>${a.nome}</b><small>${inf.anos || ""}</small></div>
+        <div class="evolucao" title="Evolução: ${dom}%"><div class="barra"><i style="width:${dom}%"></i></div><small>${a.obras.length ? `${vistas}/${a.obras.length} obras · ${dom}%` : "obras em breve"}</small></div></button>`; }).join("") || `<p class="sub">Nenhum pintor encontrado.</p>`}</div>`;
   const busca = $("busca-pintor");
   busca.addEventListener("input", ()=>{ filtroPintor = busca.value; const pos = busca.selectionStart; renderPintores(); const b = $("busca-pintor"); b.focus(); b.setSelectionRange(pos,pos); });
-  el.querySelectorAll(".pintor").forEach(b=>b.addEventListener("click", ()=>{ AudioFX.click(); Jogo.comecar({ tipo:"pintor", valor:lista[+b.dataset.i].nome }); }));
+  el.addEventListener("error", e=>{ if(e.target.tagName==="IMG" && e.target.closest(".ret")) e.target.remove(); }, true);
+  el.querySelectorAll(".quadro").forEach(b=>b.addEventListener("click", ()=>{ AudioFX.click(); abrirPintor(b.dataset.n); }));
+}
+function abrirPintor(nome){
+  const a = listaPintores().find(x=>x.nome===nome); if(!a) return;
+  const inf = PINTORES_INFO[nome] || {}, dom = Prog.dominioPintor(nome), vistas = a.obras.filter(o=>Prog.P.vistas[o.id]).length;
+  const px = Prog.P.pintores[nome] || { acertos:0, total:0 }, prec = px.total ? Math.round(100*px.acertos/px.total) : 0;
+  const trilha = Mestres.lista.find(t=>t.cfg.artista===nome);
+  const jogavel = a.obras.length >= 3;
+  const amostra = a.obras.filter(o=>!Prog.P.vistas[o.id]).slice(0,3).concat(a.obras.filter(o=>Prog.P.vistas[o.id]).slice(0,3)).slice(0,6);
+  const m = $("modal");
+  m.innerHTML = `<div class="caixa pintor-bio">
+    <div class="pb-topo"><div class="moldura grande">${retratoHtml(nome)}</div>
+      <div><h3>${nome}</h3><div class="art">${[inf.anos, inf.nac].filter(Boolean).join(" · ")}</div>${inf.mov ? `<span class="tag">${inf.mov}</span>` : ""}</div></div>
+    <p class="pb-bio">${inf.bio || "Biografia em breve."}</p>
+    <div class="evolucao grande"><div class="barra"><i style="width:${dom}%"></i></div><small>Evolução ${dom}% · ${vistas} de ${a.obras.length} obras conhecidas${px.total ? ` · ${prec}% de acertos` : ""}</small></div>
+    ${amostra.length ? `<div class="cn-tit" style="margin-top:12px">Obras no acervo</div><div class="album" id="pb-obras">${amostra.map(o=>`<img src="${Acervo.imgSrc(o)}" data-id="${o.id}" alt="" loading="lazy">`).join("")}</div>` : `<p class="art" style="margin-top:12px">As obras deste artista ainda estão a caminho do acervo.</p>`}
+    <div class="pb-btns">
+      <button class="btn ouro" id="pb-jogar" ${jogavel?"":"disabled"}>${vistas ? "Seguir o jogo" : "Começar a jogar"}</button>
+      ${trilha ? `<button class="btn" id="pb-trilha">Trilha de vida e obra</button>` : ""}
+      <button class="btn ghost" id="pb-fechar">Fechar</button></div>
+    ${jogavel ? "" : `<p class="art" style="margin-top:8px">Precisamos de pelo menos 3 obras para montar a rodada.</p>`}
+    <p class="credito">Retrato: Wikimedia Commons${inf.anos ? "" : ""}</p></div>`;
+  m.classList.add("aberto");
+  m.onclick = e => { if(e.target===m || e.target.id==="pb-fechar") m.classList.remove("aberto"); };
+  m.addEventListener("error", e=>{ if(e.target.tagName==="IMG" && e.target.closest(".ret")) e.target.remove(); }, true);
+  m.querySelectorAll("#pb-obras img").forEach(i=>i.addEventListener("click", ()=>abrirFicha(Acervo.porId[i.dataset.id])));
+  const j = $("pb-jogar"); if(j) j.onclick = ()=>{ m.classList.remove("aberto"); Jogo.comecar({ tipo:"pintor", valor:nome }); };
+  const t = $("pb-trilha"); if(t) t.onclick = ()=>{ m.classList.remove("aberto"); mestreAberto = trilha.id; irPara("mestres"); };
 }
 
 /* ---------------- mestres (trilhas de vida e obra) ---------------- */
@@ -142,8 +204,9 @@ function renderMestres(){
     el.innerHTML = `<h2 class="sec">Mestres</h2><p class="sub">Trilhas com a vida e a obra de grandes pintores: capítulos, linha do tempo, obras e curiosidades. Cada capítulo concluído libera o próximo.</p>
       <div class="cn-atalhos"><button class="chip" id="guia-arte">📘 Guia de arte <small>${Conceitos.totalVistos()}/${Conceitos.lista.length}</small></button><button class="chip" id="praticar-cn">🧠 Praticar conceitos</button></div>
       ${Mestres.lista.map(t=>{ const c = t.cfg, n = t.capitulos.length, h = c.hero;
-        return `<button class="vg-heroi" data-m="${c.id}" style="display:block;width:100%;text-align:left;background:${h.fundo}"><h2 style="color:${h.cor}">${c.icone} ${c.nome}</h2><p>${h.texto}</p>
+        return `<button class="vg-heroi" data-m="${c.id}" style="display:block;width:100%;text-align:left;background:${h.fundo}"><div class="hero-topo"><div class="hero-ret moldura">${retratoHtml(c.artista)}</div><h2 style="color:${h.cor}">${c.nome}</h2></div><p>${h.texto}</p>
           <div class="prog" style="color:${h.cor}">${t.concluidos()}/${n} capítulos · ${t.totalEstrelas()}/${n*3} ★ · ${t.obrasNoAcervo()} obras com imagem no acervo</div></button>`; }).join("")}`;
+    el.addEventListener("error", e=>{ if(e.target.tagName==="IMG" && e.target.closest(".ret")) e.target.remove(); }, true);
     $("guia-arte").onclick = ()=>{ AudioFX.click(); abrirGuia(); };
     $("praticar-cn").onclick = ()=>{ AudioFX.click(); Jogo.comecar({ tipo:"conceitos", valor:"conceitos" }); };
     el.querySelectorAll("[data-m]").forEach(b=>b.addEventListener("click", ()=>{ AudioFX.click(); mestreAberto = b.dataset.m; el.scrollTop = 0; renderMestres(); }));
@@ -151,7 +214,7 @@ function renderMestres(){
   }
   const T = Mestres.get(mestreAberto), c = T.cfg, n = T.capitulos.length, lim = c.liberaExtras || 3;
   el.innerHTML = `<button class="chip" id="m-voltar" style="margin-bottom:10px">← Todos os mestres</button>
-    <div class="vg-heroi" style="background:${c.hero.fundo}"><h2 style="color:${c.hero.cor}">${c.icone} ${c.nome}</h2><p>${c.hero.texto}</p>
+    <div class="vg-heroi" style="background:${c.hero.fundo}"><div class="hero-topo"><div class="hero-ret moldura">${retratoHtml(c.artista)}</div><h2 style="color:${c.hero.cor}">${c.nome}</h2></div><p>${c.hero.texto}</p>
       <div class="prog" style="color:${c.hero.cor}">${T.concluidos()}/${n} capítulos · ${T.totalEstrelas()}/${n*3} ★ · ${T.obrasNoAcervo()} obras com imagem no acervo</div></div>
     ${c.catalogo ? `<details class="cn-det"><summary>📚 Catálogo de obras <small>${c.catalogo.length} obras · títulos e fases</small></summary>${[...new Set(c.catalogo.map(o=>o.fase||"Outras"))].map(f=>`<div class="cn-tit" style="margin-top:8px">${f}</div><ul style="margin:4px 0 4px 18px;font-size:.9em">${c.catalogo.filter(o=>(o.fase||"Outras")===f).map(o=>`<li>${o.t}${o.ano ? " ("+o.ano+")" : ""}</li>`).join("")}</ul>`).join("")}</details>` : ""}
     <div class="sep">Vida e obra</div>

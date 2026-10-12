@@ -187,5 +187,5 @@ function atualizarControleMusica(){
   const el = document.getElementById("sv-musica"); if(!el) return;
   const p = Musica.atual();
   el.querySelector(".mu-titulo").innerHTML = Musica.mudo ? "Música desligada" : `♪ <b>${p.compositor}</b> — ${p.titulo}`;
-  el.querySelector("#mu-mudo").textContent = Musica.mudo ? "🔇" : "🔊";
+  el.querySelector("#mu-mudo").classList.toggle("mudo", !!Musica.mudo);
 }
