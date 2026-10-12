@@ -9,7 +9,7 @@ class Trilha {
   constructor(cfg){
     this.cfg = cfg; this.id = cfg.id; this.capitulos = cfg.capitulos;
     this.extras = [
-      { id:"galeria", icone:"🖼️", titulo:"Galeria de obras", desc:"Reconheça títulos, anos e lugares em obras do acervo" },
+      ...(cfg.semGaleria ? [] : [{ id:"galeria", icone:"🖼️", titulo:"Galeria de obras", desc:"Reconheça títulos, anos e lugares em obras do acervo" }]),
       { id:"estilo",  icone:"💬", titulo:cfg.estiloTitulo || "Estilo e método", desc:cfg.estiloDesc || "Técnica e pensamento" },
       { id:"jornada", icone:"🧭", titulo:"Jornada completa", desc:"Toda a vida e obra, misturadas" },
     ];
