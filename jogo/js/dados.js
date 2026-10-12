@@ -128,9 +128,9 @@ const Acervo = {
       clearTimeout(t);
       if(!r.ok) throw new Error("HTTP "+r.status);
       linhas = await r.json();
-      try{ localStorage.setItem("artnexus_nuvem_v3", JSON.stringify(linhas)); }catch(e){}
+      try{ localStorage.setItem("artnexus_nuvem_v4", JSON.stringify(linhas)); }catch(e){}
     }catch(e){
-      try{ linhas = JSON.parse(localStorage.getItem("artnexus_nuvem_v3")); }catch(_){}
+      try{ linhas = JSON.parse(localStorage.getItem("artnexus_nuvem_v4")); }catch(_){}
     }
     return Array.isArray(linhas) ? this.incorporarNuvem(linhas) : 0;
   },
