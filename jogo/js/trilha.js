@@ -8,11 +8,28 @@
 class Trilha {
   constructor(cfg){
     this.cfg = cfg; this.id = cfg.id; this.capitulos = cfg.capitulos;
-    this.extras = [
-      ...(cfg.semGaleria ? [{ id:"catalogo", icone:"📚", titulo:"Catálogo de obras", desc:"Fases e títulos das obras (sem imagens)" }] : [{ id:"galeria", icone:"🖼️", titulo:"Galeria de obras", desc:"Reconheça títulos, anos e lugares em obras do acervo" }]),
-      { id:"estilo",  icone:"💬", titulo:cfg.estiloTitulo || "Estilo e método", desc:cfg.estiloDesc || "Técnica e pensamento" },
-      { id:"jornada", icone:"🧭", titulo:"Jornada completa", desc:"Toda a vida e obra, misturadas" },
-    ];
+  }
+
+  /* modos extras: a galeria só aparece quando há obras com imagem; o catálogo quando a trilha tem lista em texto */
+  get extras(){
+    const c = this.cfg, out = [];
+    if(Object.keys(this.galeriaMapa()).some(id=>Acervo.porId[id])) out.push({ id:"galeria", icone:"🖼️", titulo:"Galeria de obras", desc:"Reconheça títulos, anos e fases em obras do acervo" });
+    if(c.catalogo) out.push({ id:"catalogo", icone:"📚", titulo:"Catálogo de obras", desc:"Fases e títulos das obras" });
+    out.push({ id:"estilo", icone:"💬", titulo:c.estiloTitulo || "Estilo e método", desc:c.estiloDesc || "Técnica e pensamento" });
+    out.push({ id:"jornada", icone:"🧭", titulo:"Jornada completa", desc:"Toda a vida e obra, misturadas" });
+    return out;
+  }
+  /* galeria escrita à mão + obras do acervo cujo título bate com o catálogo (ex.: imagens que o usuário enviar) */
+  galeriaMapa(){
+    const g = { ...(this.cfg.galeria || {}) };
+    if(this.cfg.catalogo){
+      const norm = t => String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+      const porTitulo = new Map(this.cfg.catalogo.map(o=>[norm(o.t), o]));
+      Acervo.obras.filter(o=>o.artista === this.cfg.artista && !g[o.id]).forEach(o=>{
+        const e = porTitulo.get(norm(o.titulo)); if(e) g[o.id] = { ano:e.ano, fase:e.fase || undefined };
+      });
+    }
+    return g;
   }
 
   /* ---------- progresso ---------- */
@@ -85,7 +102,7 @@ class Trilha {
       custom:true, semObra:true, detalhe:`${alvo.t} é de ${alvo.a}.`, longo:true };
   }
   galeria(nivel){
-    const { galeria, nomeCurto, verbo } = this.cfg, n = NIVEIS[nivel].opcoes - 1;
+    const { nomeCurto, verbo } = this.cfg, galeria = this.galeriaMapa(), n = NIVEIS[nivel].opcoes - 1;
     const ids = Object.keys(galeria).filter(id=>Acervo.porId[id]);
     const todos = ids.map(id=>Acervo.porId[id]);
     const ondes = [...new Set(ids.map(id=>galeria[id].onde).filter(Boolean))];

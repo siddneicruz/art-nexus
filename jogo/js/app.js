@@ -143,7 +143,7 @@ function renderMestres(){
       <div class="cn-atalhos"><button class="chip" id="guia-arte">📘 Guia de arte <small>${Conceitos.totalVistos()}/${Conceitos.lista.length}</small></button><button class="chip" id="praticar-cn">🧠 Praticar conceitos</button></div>
       ${Mestres.lista.map(t=>{ const c = t.cfg, n = t.capitulos.length, h = c.hero;
         return `<button class="vg-heroi" data-m="${c.id}" style="display:block;width:100%;text-align:left;background:${h.fundo}"><h2 style="color:${h.cor}">${c.icone} ${c.nome}</h2><p>${h.texto}</p>
-          <div class="prog" style="color:${h.cor}">${t.concluidos()}/${n} capítulos · ${t.totalEstrelas()}/${n*3} ★ · ${t.cfg.semGaleria ? "sem imagens (direitos autorais)" : t.obrasNoAcervo()+" obras no acervo"}</div></button>`; }).join("")}`;
+          <div class="prog" style="color:${h.cor}">${t.concluidos()}/${n} capítulos · ${t.totalEstrelas()}/${n*3} ★ · ${t.obrasNoAcervo()} obras com imagem no acervo</div></button>`; }).join("")}`;
     $("guia-arte").onclick = ()=>{ AudioFX.click(); abrirGuia(); };
     $("praticar-cn").onclick = ()=>{ AudioFX.click(); Jogo.comecar({ tipo:"conceitos", valor:"conceitos" }); };
     el.querySelectorAll("[data-m]").forEach(b=>b.addEventListener("click", ()=>{ AudioFX.click(); mestreAberto = b.dataset.m; el.scrollTop = 0; renderMestres(); }));
@@ -152,8 +152,8 @@ function renderMestres(){
   const T = Mestres.get(mestreAberto), c = T.cfg, n = T.capitulos.length, lim = c.liberaExtras || 3;
   el.innerHTML = `<button class="chip" id="m-voltar" style="margin-bottom:10px">← Todos os mestres</button>
     <div class="vg-heroi" style="background:${c.hero.fundo}"><h2 style="color:${c.hero.cor}">${c.icone} ${c.nome}</h2><p>${c.hero.texto}</p>
-      <div class="prog" style="color:${c.hero.cor}">${T.concluidos()}/${n} capítulos · ${T.totalEstrelas()}/${n*3} ★ · ${T.cfg.semGaleria ? "sem imagens (direitos autorais)" : T.obrasNoAcervo()+" obras no acervo"}</div></div>
-    ${c.catalogo ? `<details class="cn-det"><summary>📚 Catálogo de obras <small>${c.catalogo.length} obras · só texto, sem imagens (direitos autorais)</small></summary>${[...new Set(c.catalogo.map(o=>o.fase||"Outras"))].map(f=>`<div class="cn-tit" style="margin-top:8px">${f}</div><ul style="margin:4px 0 4px 18px;font-size:.9em">${c.catalogo.filter(o=>(o.fase||"Outras")===f).map(o=>`<li>${o.t}${o.ano ? " ("+o.ano+")" : ""}</li>`).join("")}</ul>`).join("")}</details>` : ""}
+      <div class="prog" style="color:${c.hero.cor}">${T.concluidos()}/${n} capítulos · ${T.totalEstrelas()}/${n*3} ★ · ${T.obrasNoAcervo()} obras com imagem no acervo</div></div>
+    ${c.catalogo ? `<details class="cn-det"><summary>📚 Catálogo de obras <small>${c.catalogo.length} obras · títulos e fases</small></summary>${[...new Set(c.catalogo.map(o=>o.fase||"Outras"))].map(f=>`<div class="cn-tit" style="margin-top:8px">${f}</div><ul style="margin:4px 0 4px 18px;font-size:.9em">${c.catalogo.filter(o=>(o.fase||"Outras")===f).map(o=>`<li>${o.t}${o.ano ? " ("+o.ano+")" : ""}</li>`).join("")}</ul>`).join("")}</details>` : ""}
     <div class="sep">Vida e obra</div>
     ${T.capitulos.map(k=>{
       const lib = T.liberado(k.id), est = T.estrelas(k.id);

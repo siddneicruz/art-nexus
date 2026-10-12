@@ -1,12 +1,14 @@
-/* TARSILA DO AMARAL — base: https://www.tarsiladoamaraloficial.com.br/blank-1
+/* As imagens das obras (direitos autorais) serão fornecidas pelo dono do jogo: ao entrarem no acervo com o mesmo título
+   do catálogo abaixo, a Galeria de obras aparece sozinha. Antes disso a trilha funciona só em texto.
+   TARSILA DO AMARAL — base: https://www.tarsiladoamaraloficial.com.br/blank-1
    As obras de Tarsila estão sob direitos autorais (ela morreu em 1973): esta trilha NÃO usa imagens,
    só vida, fases e títulos. Só entram datas que a página traz; A Negra aparece sem ano porque a página não o informa. */
 Mestres.registrar({
-  id:"tarsila", nome:"Tarsila do Amaral", nomeCurto:"Tarsila", icone:"🌴", sujeito:"Tarsila", verbo:"pintou", iniciada:"pintada", semGaleria:true,
+  id:"tarsila", nome:"Tarsila do Amaral", nomeCurto:"Tarsila", icone:"🌴", sujeito:"Tarsila", verbo:"pintou", iniciada:"pintada",
   hero:{ texto:"Da fazenda em Capivari ao Abaporu: a pintora que levou o Brasil, suas cores e suas gentes para o centro da arte moderna.",
          fundo:"linear-gradient(160deg,#1d4a2f 0%,#c9742a 55%,#f2d16b 130%)", cor:"#fff4d6" },
-  fases:["Barcelona","Paris"],
-  textoFase:"Em que fase Tarsila pintou esta obra?",
+  fases:["Pau Brasil","Antropofágica","Social","Neo Pau-Brasil"],
+  textoFase:"A que fase de Tarsila pertence esta obra?",
   estiloTitulo:"Fases e cores do Brasil", estiloDesc:"Pau Brasil, Antropofagia e fase social",
   anoMin:1886, anoMax:1973, liberaExtras:3,
   medalhaFim:{ id:"m-tarsila", icone:"🌴", nome:"Abaporu", desc:"Conclua os 4 capítulos de Tarsila" },
