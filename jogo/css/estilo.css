@@ -74,7 +74,7 @@ blockquote.intro-frase{font-family:var(--serif);font-style:italic;font-size:19px
 .medalha b{display:block;font-size:24px;margin-bottom:2px;filter:grayscale(1);opacity:.4}.medalha.ok{color:var(--parchment);border-color:var(--gold)}.medalha.ok b{filter:none;opacity:1}
 .album{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.album img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
 /* modal ficha */
-.modal{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.82);display:none;align-items:flex-end;justify-content:center}
+.modal{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.82);display:none;align-items:flex-end;justify-content:center}
 .modal.aberto{display:flex}
 .modal .caixa{width:100%;max-width:720px;max-height:92%;overflow-y:auto;background:var(--panel);border-radius:18px 18px 0 0;border:1px solid var(--gold);padding:14px}
 .modal img{width:100%;max-height:46vh;object-fit:contain;background:#000;border-radius:10px}
