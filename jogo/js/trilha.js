@@ -9,7 +9,7 @@ class Trilha {
   constructor(cfg){
     this.cfg = cfg; this.id = cfg.id; this.capitulos = cfg.capitulos;
     this.extras = [
-      ...(cfg.semGaleria ? [] : [{ id:"galeria", icone:"🖼️", titulo:"Galeria de obras", desc:"Reconheça títulos, anos e lugares em obras do acervo" }]),
+      ...(cfg.semGaleria ? [{ id:"catalogo", icone:"📚", titulo:"Catálogo de obras", desc:"Fases e títulos das obras (sem imagens)" }] : [{ id:"galeria", icone:"🖼️", titulo:"Galeria de obras", desc:"Reconheça títulos, anos e lugares em obras do acervo" }]),
       { id:"estilo",  icone:"💬", titulo:cfg.estiloTitulo || "Estilo e método", desc:cfg.estiloDesc || "Técnica e pensamento" },
       { id:"jornada", icone:"🧭", titulo:"Jornada completa", desc:"Toda a vida e obra, misturadas" },
     ];
@@ -112,6 +112,20 @@ class Trilha {
     });
     return out.filter(q=>q.opcoes.length >= 3);   // título sem opções compatíveis é descartado
   }
+  /* catálogo em texto: a que fase pertence cada obra / qual obra é de cada fase */
+  catalogo(nivel){
+    const cat = (this.cfg.catalogo || []).filter(o=>o.fase), n = NIVEIS[nivel].opcoes - 1, out = [];
+    const fases = [...new Set(cat.map(o=>o.fase))];
+    cat.forEach(o=>{
+      const outras = embaralhar(fases.filter(f=>f!==o.fase)).slice(0,n);
+      if(outras.length >= 2) out.push({ tipo:"vg-obra", texto:`A que fase de ${this.cfg.nomeCurto} pertence a obra «${o.t}»?`, certa:o.fase, opcoes:embaralhar([o.fase, ...outras]),
+        custom:true, semObra:true, detalhe:`${o.t} é da fase ${o.fase}${o.ano ? " ("+o.ano+")" : ""}.` });
+      const erradas = embaralhar(cat.filter(x=>x.fase!==o.fase)).slice(0,n);
+      if(erradas.length >= 2) out.push({ tipo:"vg-obra", texto:`Qual destas obras é da fase ${o.fase}?`, certa:o.t, opcoes:embaralhar([o.t, ...erradas.map(x=>x.t)]),
+        custom:true, semObra:true, longo:true, detalhe:`${o.t} é da fase ${o.fase}${o.ano ? " ("+o.ano+")" : ""}.` });
+    });
+    return out;
+  }
   doCapitulo(id, nivel){
     const out = [];
     (this.cfg.perguntas[id] || []).forEach(d=>{ const q = this.montarEscrita(d, nivel); if(q) out.push(q); });
@@ -132,6 +146,7 @@ class Trilha {
     const v = esc.valor;
     if(this.cap(v)) pool = this.doCapitulo(v, nivel);
     else if(v === "galeria") pool = this.galeria(nivel);
+    else if(v === "catalogo") pool = this.catalogo(nivel);
     else if(v === "estilo"){
       pool = this.cfg.estilo.map(d=>this.montarEscrita(d, nivel)).filter(Boolean);
       const ids = [...new Set(this.capitulos.flatMap(c=>Conceitos.doCapitulo(this.id, c.id)))];
@@ -140,6 +155,7 @@ class Trilha {
     else {
       this.capitulos.forEach(c=>{ embaralhar(this.doCapitulo(c.id, nivel)).slice(0,5).forEach(q=>pool.push(q)); });
       embaralhar(this.cfg.estilo).slice(0,4).forEach(d=>{ const q = this.montarEscrita(d, nivel); if(q) pool.push(q); });
+      if(this.cfg.catalogo) embaralhar(this.catalogo(nivel)).slice(0,3).forEach(q=>pool.push(q));
       const o = this.ordemEventos(this.cfg.eventos, nivel); if(o) pool.push(o);
       const o2 = this.ordemObras(this.cfg.obras, nivel); if(o2) pool.push(o2);
       const o3 = this.obraDeAno(nivel); if(o3) pool.push(o3);

@@ -153,6 +153,7 @@ function renderMestres(){
   el.innerHTML = `<button class="chip" id="m-voltar" style="margin-bottom:10px">← Todos os mestres</button>
     <div class="vg-heroi" style="background:${c.hero.fundo}"><h2 style="color:${c.hero.cor}">${c.icone} ${c.nome}</h2><p>${c.hero.texto}</p>
       <div class="prog" style="color:${c.hero.cor}">${T.concluidos()}/${n} capítulos · ${T.totalEstrelas()}/${n*3} ★ · ${T.cfg.semGaleria ? "sem imagens (direitos autorais)" : T.obrasNoAcervo()+" obras no acervo"}</div></div>
+    ${c.catalogo ? `<details class="cn-det"><summary>📚 Catálogo de obras <small>${c.catalogo.length} obras · só texto, sem imagens (direitos autorais)</small></summary>${[...new Set(c.catalogo.map(o=>o.fase||"Outras"))].map(f=>`<div class="cn-tit" style="margin-top:8px">${f}</div><ul style="margin:4px 0 4px 18px;font-size:.9em">${c.catalogo.filter(o=>(o.fase||"Outras")===f).map(o=>`<li>${o.t}${o.ano ? " ("+o.ano+")" : ""}</li>`).join("")}</ul>`).join("")}</details>` : ""}
     <div class="sep">Vida e obra</div>
     ${T.capitulos.map(k=>{
       const lib = T.liberado(k.id), est = T.estrelas(k.id);
