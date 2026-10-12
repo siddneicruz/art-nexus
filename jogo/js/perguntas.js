@@ -31,6 +31,23 @@ function distratores(certo, todos, n, perto=[]){
   return [...a, ...b].slice(0, n);
 }
 
+/* Grupo visual provável de um título: evita opções absurdas (montanha x autorretrato) */
+const GRUPOS_TITULO = [
+  ["natureza", /natureza[- ]morta|cr[âa]nios?|caveira|flores|girass|vaso|ma[cç]ãs|frutas|cesta|buqu[eê]|lírios|íris|ir[ií]s/i],
+  ["pessoas", /retrato|autorretrato|auto-retrato|jogadores|banhistas?|m[uú]sicos?|dan[cç]a|bailarina|jovem|menina|menino|mulher|homem|dama|senhor|senhora|crian[cç]a|camponês|camponesa|pastor|madona|virgem|cristo|anuncia[cç][aã]o|ceia|crucifica|ador[aã][cç][aã]o|davi|pietà|pieta|gioconda|monalisa|mona lisa|leiteira|aula de anatomia|ronda|noiva|tocador|comedores|cabeça|beijo|abra[cç]o|família/i],
+  ["paisagem", /monte|montanha|paisagem|rio\b|ponte|campo|campos|mar\b|vista|jardim|colina|catedral|estrada|floresta|c[eé]u|noite estrelada|lago|nin[fé]|álamos|palheiro|trigo|celeiro|igreja|porto|praia|cais|neve/i],
+];
+/* revelação progressiva: grade 3x4 com algumas peças abertas; abrem mais com o tempo */
+function novaRevelacao(){ const cols = 3, rows = 4, total = cols*rows; return { cols, rows, total, inicial:3, ordem:embaralhar(Array.from({length:total},(_,i)=>i)) }; }
+function grupoTitulo(t){ t = String(t||""); for(const [g,re] of GRUPOS_TITULO) if(re.test(t)) return g; return null; }
+function titulosCompativeis(certo, lista){
+  const g = grupoTitulo(certo);
+  if(!g) return lista;
+  const mesmo = lista.filter(t=>grupoTitulo(t)===g);
+  if(mesmo.length >= 6) return mesmo;            // de preferência só títulos do mesmo tipo de imagem
+  return lista.filter(t=>{ const x = grupoTitulo(t); return !x || x===g; });
+}
+
 const Perguntas = {
   /* escopo: {tipo:"pais"|"pintor"|"misto"|"diario", valor} */
   obrasDo(esc){
@@ -96,21 +113,21 @@ const Perguntas = {
       }
       case "zoom": {
         const perto = todas.filter(w=>w.pais===o.pais || (o.movimento && w.movimento===o.movimento)).map(w=>w.artista);
-        return mk("Que artista pintou esta obra? (veja só um detalhe)", o.artista, distratores(o.artista, todas.map(w=>w.artista), n, perto),
-          { imagem:true, zoom:{ x:20+Math.random()*60, y:20+Math.random()*60 } });
+        return mk("Que artista pintou esta obra? (a imagem vai se revelando)", o.artista, distratores(o.artista, todas.map(w=>w.artista), n, perto),
+          { imagem:true, revela:novaRevelacao() });
       }
       case "titulo": {
         if(o.nuvem && !o.tituloOk) return null;
-        const mesmo = todas.filter(w=>w.artista===o.artista && w.id!==o.id && (w.rica || w.tituloOk)).map(w=>w.titulo);
-        const outros = todas.filter(w=>(w.rica || w.tituloOk) && w.id!==o.id).map(w=>w.titulo);
+        const mesmo = titulosCompativeis(o.titulo, todas.filter(w=>w.artista===o.artista && w.id!==o.id && (w.rica || w.tituloOk)).map(w=>w.titulo));
+        const outros = titulosCompativeis(o.titulo, todas.filter(w=>(w.rica || w.tituloOk) && w.id!==o.id).map(w=>w.titulo));
         return mk("Qual é o título desta obra?", o.titulo, distratores(o.titulo, outros, n, mesmo), { imagem:true });
       }
       case "zoomtitulo": {
         if(o.nuvem && !o.tituloOk) return null;
-        const mesmo = todas.filter(w=>w.artista===o.artista && w.id!==o.id && (w.rica || w.tituloOk)).map(w=>w.titulo);
-        const outros = todas.filter(w=>(w.rica || w.tituloOk) && w.id!==o.id).map(w=>w.titulo);
-        return mk("Qual é o título desta obra? (veja só um detalhe)", o.titulo, distratores(o.titulo, outros, n, mesmo),
-          { imagem:true, longo:true, zoom:{ x:20+Math.random()*60, y:20+Math.random()*60 } });
+        const mesmo = titulosCompativeis(o.titulo, todas.filter(w=>w.artista===o.artista && w.id!==o.id && (w.rica || w.tituloOk)).map(w=>w.titulo));
+        const outros = titulosCompativeis(o.titulo, todas.filter(w=>(w.rica || w.tituloOk) && w.id!==o.id).map(w=>w.titulo));
+        return mk("Qual é o título desta obra? (a imagem vai se revelando)", o.titulo, distratores(o.titulo, outros, n, mesmo),
+          { imagem:true, longo:true, revela:novaRevelacao() });
       }
       case "movimento": {
         if(!o.movimento) return null;

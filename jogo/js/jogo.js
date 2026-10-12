@@ -8,7 +8,7 @@ function hashTxt(s){ let h = 2166136261; for(let i=0;i<s.length;i++){ h ^= s.cha
 
 const Jogo = {
   esc:null, nivel:"iniciante", fila:[], idx:0, respondidas:0, acertos:0, vidas:3, seq:0, melhorSeq:0, pontos:0,
-  historico:[], respondida:false, conceitosMostrados:new Set(), t0:0, timer:null, bonusDiario:false,
+  historico:[], tempos:[], respondida:false, conceitosMostrados:new Set(), t0:0, timer:null, bonusDiario:false,
 
   nomeEscopo(e = this.esc){
     if(!e) return "";
@@ -52,7 +52,7 @@ const Jogo = {
     el.querySelector("#intro-ir").addEventListener("click", ()=>{ AudioFX.click(); this.mostrar(); });
   },
 
-  sair(){ clearInterval(this.timer); document.getElementById("tela-jogo").classList.remove("aberta"); renderTudo(); },
+  sair(){ clearInterval(this.timer); clearInterval(this.timerRev); document.getElementById("tela-jogo").classList.remove("aberta"); renderTudo(); },
 
   total(){ return Math.min(RODADA, this.fila.length); },
 
@@ -90,6 +90,15 @@ const Jogo = {
       pre.src = url;
     }
     this.t0 = Date.now();
+    if(q.revela){
+      this.abertas = 0;
+      const ctl = document.createElement("div"); ctl.className = "rev-ctl"; ctl.innerHTML = `<span id="rev-info"></span><button class="chip" id="rev-mais">👁 Revelar mais</button>`;
+      el.querySelector("#jg-img").after(ctl);
+      for(let i=0;i<q.revela.inicial;i++) this.revelarMais(q, true);
+      this.timerRev = setInterval(()=>this.revelarMais(q), 3500);
+      ctl.querySelector("#rev-mais").addEventListener("click", ()=>this.revelarMais(q));
+      this.infoRevela(q);
+    }
     if(N.limite){
       const barra = el.querySelector("#jg-barra");
       this.timer = setInterval(()=>{
@@ -101,16 +110,35 @@ const Jogo = {
     }
   },
 
+  /* abre mais uma peça da grade; quanto mais peças abertas, menos a resposta vale */
+  revelarMais(q, inicial){
+    const r = q.revela; if(!r || this.respondida || this.abertas >= r.total) { if(this.abertas >= r.total) clearInterval(this.timerRev); return; }
+    const cel = document.querySelector(`#jg-img .rev i[data-c="${r.ordem[this.abertas]}"]`);
+    if(cel) cel.classList.add("aberta");
+    this.abertas++;
+    if(!inicial) this.infoRevela(q);
+    if(this.abertas >= r.total) clearInterval(this.timerRev);
+  },
+  fatorRevela(q){ const r = q.revela; if(!r) return 1; return 1 - 0.5 * Math.max(0, this.abertas - r.inicial) / (r.total - r.inicial); },
+  infoRevela(q){
+    const i = document.getElementById("rev-info"); if(!i) return;
+    i.textContent = `${this.abertas}/${q.revela.total} peças · vale ${Math.round(this.fatorRevela(q)*100)}%`;
+    if(this.abertas >= q.revela.total){ const b = document.getElementById("rev-mais"); if(b) b.disabled = true; }
+  },
+
   htmlImagem(q, revelada){
     if(!q.imagem) return `<div class="sem-img">🖼️</div>`;
     const url = Acervo.imgSrc(q.obra);
-    if(q.zoom && !revelada) return `<div class="zoom" style="background-image:url('${url}');background-position:${q.zoom.x}% ${q.zoom.y}%"></div>`;
+    if(q.revela && !revelada){
+      const r = q.revela;
+      return `<div class="revbox"><img src="${url}" alt="obra"><div class="rev" style="grid-template-columns:repeat(${r.cols},1fr);grid-template-rows:repeat(${r.rows},1fr)">${Array.from({length:r.total},(_,i)=>`<i data-c="${i}"></i>`).join("")}</div></div>`;
+    }
     return `<img src="${url}" alt="obra">`;
   },
 
   responder(escolha){
     if(this.respondida) return;
-    clearInterval(this.timer);
+    clearInterval(this.timer); clearInterval(this.timerRev);
     this.respondida = true;
     const N = NIVEIS[this.nivel], q = this.fila[this.idx], el = document.getElementById("tela-jogo");
     const acertou = escolha === q.certa, seg = (Date.now()-this.t0)/1000;
@@ -118,11 +146,12 @@ const Jogo = {
     if(acertou){
       this.seq++; this.melhorSeq = Math.max(this.melhorSeq, this.seq); this.acertos++;
       const mult = 1 + Math.min(this.seq-1, 10) * 0.1;
-      ganho = Math.round(100 * N.mult * mult + 50 * N.mult * Math.max(0, 1 - seg/20));
+      ganho = Math.round((100 * N.mult * mult + 50 * N.mult * Math.max(0, 1 - seg/20)) * this.fatorRevela(q));
       if(this.bonusDiario) ganho *= 2;
       this.pontos += ganho; AudioFX.success();
     } else { this.seq = 0; this.vidas--; AudioFX.error(); }
     this.respondidas++;
+    this.tempos.push({ seg: Math.min(seg, N.limite || 60), acertou });
     this.historico.push(acertou);
     this.fila[this.idx].resultado = { acertou, escolha, ganho };
     // revela
@@ -130,13 +159,13 @@ const Jogo = {
       b.disabled = true;
       if(b.dataset.op === q.certa) b.classList.add("certa"); else if(b.dataset.op === escolha) b.classList.add("errada");
     });
-    if(q.zoom && el.querySelector("#jg-img")) el.querySelector("#jg-img").innerHTML = this.htmlImagem(q, true);
+    if(q.revela && el.querySelector("#jg-img")){ el.querySelector("#jg-img").innerHTML = this.htmlImagem(q, true); el.querySelector(".rev-ctl")?.remove(); }
     const fim = this.vidas<=0 || this.respondidas>=this.total();
     const cn = Conceitos.paraResposta(q, this.esc, this.conceitosMostrados || (this.conceitosMostrados = new Set()));
     if(cn){ this.conceitosMostrados.add(cn.id); Conceitos.visto(cn.id); }
     el.querySelector("#jg-fb").innerHTML = `
       <div class="jg-fb ${acertou?"ok":"erro"}">
-        <div class="jg-fb-t">${acertou ? `✔ Correto! <span>+${ganho}</span>` : (escolha===null ? "⏱ Tempo esgotado" : "✘ Não foi dessa vez")}${!acertou && q.certa ? `<small>Resposta: ${q.certa}</small>` : ""}</div>
+        <div class="jg-fb-t">${acertou ? `✔ Correto! <span>+${ganho}</span> <small class="jg-seg">⏱ ${seg.toFixed(1).replace(".",",")} s</small>` : (escolha===null ? "⏱ Tempo esgotado" : "✘ Não foi dessa vez")}${!acertou && q.certa ? `<small>Resposta: ${q.certa}</small>` : ""}</div>
         <div class="jg-fb-txt">${Perguntas.explicar(q)}</div>
         ${cn ? Conceitos.linhaResposta(cn) : ""}
         <div class="jg-fb-btns">
@@ -154,14 +183,14 @@ const Jogo = {
   },
 
   finalizar(){
-    clearInterval(this.timer);
+    clearInterval(this.timer); clearInterval(this.timerRev);
     const el = document.getElementById("tela-jogo"), total = this.total();
     const completou = this.respondidas >= total && this.vidas > 0;
     const estrelas = completou ? (this.acertos/total>=0.9 ? 3 : this.acertos/total>=0.7 ? 2 : this.acertos/total>=0.5 ? 1 : 0) : 0;
     const resp = this.fila.filter(q=>q.resultado);
     const novidades = Prog.concluir({
       escopo:this.esc, nivel:this.nivel, pontos:this.pontos, acertos:this.acertos, total, respondidas:this.respondidas,
-      melhorSeq:this.melhorSeq, estrelas,
+      melhorSeq:this.melhorSeq, estrelas, tempos:this.tempos,
       tiposAcertos: resp.filter(q=>q.resultado.acertou).map(q=>q.tipo),
       vistas: resp.filter(q=>q.resultado.acertou && !q.semObra).map(q=>q.obra.id),
     });
@@ -179,6 +208,7 @@ const Jogo = {
           <div><b>${this.acertos}/${this.respondidas}</b><small>acertos</small></div>
           <div><b>${this.pontos.toLocaleString("pt-BR")}</b><small>pontos</small></div>
           <div><b>${this.melhorSeq}</b><small>melhor sequência</small></div>
+          <div><b>${this.tempos.length ? (this.tempos.reduce((s,t)=>s+t.seg,0)/this.tempos.length).toFixed(1).replace(".",",")+" s" : "–"}</b><small>tempo médio</small></div>
         </div>
         ${this.bonusDiario ? `<p class="nota">Primeiro desafio do dia: pontos em dobro!</p>` : ""}
         <div class="xp"><div class="xp-top"><span>${pt.atual.nome}</span><span>${pt.prox ? `${(Prog.P.xp).toLocaleString("pt-BR")} / ${pt.prox.xp.toLocaleString("pt-BR")} XP` : "nível máximo"}</span></div><div class="barra"><i style="width:${pctXp}%"></i></div></div>

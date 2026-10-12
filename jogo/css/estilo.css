@@ -151,3 +151,13 @@ blockquote.intro-frase{font-family:var(--serif);font-style:italic;font-size:19px
 .cn-dica{display:flex;gap:8px;margin:10px 0;padding:10px 12px;border-left:3px solid var(--gold);background:rgba(201,161,59,.1);border-radius:8px;font-size:.9em;text-align:left}
 .cn-mais{background:none;border:0;color:var(--gold);text-decoration:underline;font:inherit;cursor:pointer;padding:0 0 0 4px}
 #modal .caixa{max-height:86vh;overflow-y:auto}
+
+/* ---------- revelação progressiva e tempo ---------- */
+.jg-img{position:relative}
+.jg-img .rev{position:absolute;inset:0;display:grid;gap:0}
+.jg-img .rev i{background:#14110d;border:1px solid rgba(201,161,59,.25);transition:opacity .6s}
+.jg-img .rev i.aberta{opacity:0;pointer-events:none}
+.rev-ctl{display:flex;justify-content:space-between;align-items:center;margin:-2px 0 8px;font-size:.82em;color:var(--dim)}
+.jg-seg{font-weight:400;opacity:.8;margin-left:6px}
+.jg-img .revbox{position:relative;line-height:0;max-width:100%;max-height:100%}
+.jg-img .revbox img{display:block;width:auto;height:auto;max-width:100%;max-height:min(34vh,300px)}

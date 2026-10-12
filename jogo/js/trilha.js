@@ -95,7 +95,7 @@ class Trilha {
       const o = Acervo.porId[id], g = galeria[id];
       const extra = [g.ano ? String(g.ano) : "", g.onde ? `🏛 ${g.onde}` : ""].filter(Boolean).join(" · ");
       out.push({ tipo:"vg-obra", texto:`Qual é o título desta obra de ${nomeCurto}?`, certa:o.titulo,
-        opcoes:embaralhar([o.titulo, ...embaralhar(todos.filter(x=>x.id!==id).map(x=>x.titulo)).slice(0,n)]),
+        opcoes:embaralhar([o.titulo, ...embaralhar(titulosCompativeis(o.titulo, todos.filter(x=>x.id!==id).map(x=>x.titulo))).slice(0,n)]),
         custom:true, obra:o, imagem:true, longo:true, detalhe:`${o.titulo}${extra ? " — "+extra : ""}` });
       if(g.ano) out.push({ tipo:"vg-obra", texto:`Em que ano ${nomeCurto} ${verbo} esta obra?`, certa:String(g.ano),
         opcoes:embaralhar([String(g.ano), ...this.anosProximos(g.ano, n).map(String)]),
@@ -110,7 +110,7 @@ class Trilha {
         opcoes:embaralhar([g.tecnica, ...embaralhar(tecnicas.filter(x=>x!==g.tecnica)).slice(0,n)]),
         custom:true, obra:o, imagem:true, longo:true, detalhe:`${o.titulo}: ${g.tecnica}.` });
     });
-    return out.filter(q=>q.opcoes.length >= 3);
+    return out.filter(q=>q.opcoes.length >= 3);   // título sem opções compatíveis é descartado
   }
   doCapitulo(id, nivel){
     const out = [];

@@ -24,17 +24,34 @@ function renderNiveis(){
 function abrirFicha(o){
   if(!o) return;
   const m = $("modal");
-  const meta = [o.anoTxt, o.movimento, o.tecnica].filter(Boolean).join(" · ");
+  // dados extras vindos das trilhas dos mestres (ano, fase, onde está, técnica) e da linha do tempo
+  let g = null, T = null;
+  Mestres.lista.forEach(t=>{ if(t.cfg.galeria && t.cfg.galeria[o.id]){ g = t.cfg.galeria[o.id]; T = t; } });
+  if(!T) T = Mestres.lista.find(t=>t.cfg.artista===o.artista) || null;
+  const ano = o.anoTxt || (g && g.ano ? String(g.ano) : "");
+  const tecnica = o.tecnica || (g && g.tecnica) || "";
+  const onde = o.museu || (g && g.onde) || "";
+  const meta = [ano, o.movimento, tecnica].filter(Boolean).join(" · ");
+  const anoNum = o.ano || (g && g.ano) || null;
+  const eventos = T && anoNum ? T.cfg.eventos.filter(e=>Math.abs(e.ano-anoNum)<=1).sort((x,y)=>x.ano-y.ano) : [];
+  const conceitos = Conceitos.deObra(o).slice(0,2).map(id=>Conceitos.get(id));
+  const outras = Acervo.obras.filter(x=>x.artista===o.artista && x.id!==o.id).slice(0,8);
   m.innerHTML = `<div class="caixa">
     <img src="${Acervo.imgSrc(o)}" alt="">
     <h3>${o.titulo || "Obra sem título"}</h3>
     <div class="art">${o.artista} · ${PAISES[o.pais] ? PAISES[o.pais].flag+" " : ""}${o.pais}</div>
     ${meta ? `<p>${meta}</p>` : ""}
-    ${o.localTxt ? `<p>📍 ${o.localTxt}</p>` : ""}${o.museu ? `<p>🏛 ${o.museu}</p>` : ""}
-    ${o.fatos && o.fatos.length ? `<ul>${o.fatos.map(f=>`<li>${f}</li>`).join("")}</ul>` : (o.nuvem ? `<p class="art">Obra do acervo na nuvem — a ficha completa chega em breve.</p>` : "")}
+    ${g && g.fase ? `<p>🖌 Fase: ${g.fase}</p>` : ""}
+    ${o.localTxt ? `<p>📍 ${o.localTxt}</p>` : ""}${onde ? `<p>🏛 ${onde}</p>` : ""}
+    ${o.fatos && o.fatos.length ? `<ul>${o.fatos.map(f=>`<li>${f}</li>`).join("")}</ul>` : ""}
+    ${eventos.length ? `<div class="cn-tit" style="margin-top:10px">🕰 Na vida de ${T.cfg.nomeCurto} nessa época</div><div class="vg-linha">${eventos.map(e=>`<div><b>${e.ano}</b><span>${e.curto}</span></div>`).join("")}</div>` : ""}
+    ${conceitos.length ? `<div class="cn-bloco"><div class="cn-tit">📘 Para entender esta obra</div>${conceitos.map(c=>{ Conceitos.visto(c.id); return `<details class="cn-det"><summary>${c.icone} ${c.nome} <small>${c.quando}</small></summary>${Conceitos.cartao(c)}</details>`; }).join("")}</div>` : ""}
+    ${!(o.fatos && o.fatos.length) && !eventos.length && !conceitos.length ? `<p class="art">Ainda não temos mais detalhes desta obra.</p>` : ""}
+    ${outras.length ? `<div class="cn-tit" style="margin-top:10px">🎨 Mais de ${o.artista}</div><div class="album" id="ficha-outras">${outras.map(x=>`<img src="${Acervo.imgSrc(x)}" data-id="${x.id}" alt="" loading="lazy">`).join("")}</div>` : ""}
     <div class="jg-fb-btns" style="margin-top:12px"><button class="btn ouro" id="fecha-ficha">Fechar</button></div></div>`;
   m.classList.add("aberto");
   m.onclick = e => { if(e.target===m || e.target.id==="fecha-ficha") m.classList.remove("aberto"); };
+  m.querySelectorAll("#ficha-outras img").forEach(i=>i.addEventListener("click", ()=>{ abrirFicha(Acervo.porId[i.dataset.id]); m.querySelector(".caixa").scrollTop = 0; }));
 }
 
 /* ---------------- navegação ---------------- */
@@ -167,12 +184,26 @@ function renderDiario(){
 }
 
 /* ---------------- perfil ---------------- */
+/* aptidão: mistura precisão e rapidez das últimas respostas */
+function blocoAptidao(P){
+  const tp = P.tempo; if(!tp || tp.recente.length < 8) return `<div class="sep">Aptidão</div><p class="sub">Responda mais algumas perguntas: o jogo mede a sua rapidez e precisão para dizer o quanto você está afiado.</p>`;
+  const rec = tp.recente, med = a => a.reduce((s,x)=>s+x,0)/a.length;
+  const meio = Math.floor(rec.length/2), ant = rec.slice(0,meio), atu = rec.slice(meio);
+  const prec = a => med(a.map(x=>x[1])), seg = a => med(a.map(x=>x[0]));
+  const nota = a => Math.round(100 * (0.7*prec(a) + 0.3*Math.max(0, 1 - seg(a)/20)));
+  const n = nota(rec), d = nota(atu) - nota(ant);
+  const nivel = n>=85 ? "Afiadíssimo" : n>=70 ? "Afiado" : n>=50 ? "Pegando o ritmo" : "Aquecendo";
+  return `<div class="sep">Aptidão</div>
+    <div class="grade"><div><b>${n}</b><small>${nivel}</small></div><div><b>${seg(rec).toFixed(1).replace(".",",")} s</b><small>tempo médio</small></div><div><b>${d>0?"▲":d<0?"▼":"="} ${Math.abs(d)}</b><small>vs. antes</small></div></div>
+    <p class="sub">Calculada com as suas últimas ${rec.length} respostas (70% acertos, 30% rapidez).</p>`;
+}
 function renderPerfil(){
   const P = Prog.P, pt = patenteDe(P.xp), el = $("v-perfil");
   const precisao = P.perguntas ? Math.round(100*P.acertos/P.perguntas) : 0;
   const vistas = Object.keys(P.vistas).map(id=>Acervo.porId[id]).filter(Boolean);
   el.innerHTML = `<h2 class="sec">${pt.atual.nome}</h2><p class="sub">${P.xp.toLocaleString("pt-BR")} XP${pt.prox ? ` · faltam ${(pt.prox.xp-P.xp).toLocaleString("pt-BR")} para ${pt.prox.nome}` : ""}</p>
     <div class="grade"><div><b>${P.rodadas}</b><small>rodadas</small></div><div><b>${precisao}%</b><small>precisão</small></div><div><b>${P.melhorSeq}</b><small>melhor sequência</small></div></div>
+    ${blocoAptidao(P)}
     <div class="sep">Países</div>
     ${Object.entries(PAISES).map(([n,p])=>{ const x = P.paises[n]||{}; return `<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px"><span>${p.flag} ${n}</span><span>${estrelasHtml(x.estrelas||0)} <small style="color:var(--dim);margin-left:6px">${Prog.dominioPais(n)}%</small></span></div>`; }).join("")}
     <div class="sep">Medalhas</div>

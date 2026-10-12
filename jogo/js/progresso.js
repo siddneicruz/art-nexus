@@ -33,7 +33,7 @@ MEDALHAS.push({ id:"estudioso", icone:"📚", nome:"Estudioso", desc:"Conclua ca
 
 function progressoNovo(){
   return { xp:0, rodadas:0, acertos:0, perguntas:0, melhorSeq:0, gabaritos:0, especialista:0, nivel:"iniciante",
-           paises:{}, pintores:{}, vg:{}, conceitos:{}, vistas:{}, dias:{ ultimo:"", seq:0, melhor:0 }, diario:{ data:"", pontos:0 }, medalhas:{}, tipos:{} };
+           paises:{}, pintores:{}, vg:{}, conceitos:{}, vistas:{}, dias:{ ultimo:"", seq:0, melhor:0 }, diario:{ data:"", pontos:0 }, medalhas:{}, tipos:{}, tempo:{ n:0, soma:0, acN:0, acSoma:0, recente:[] } };
 }
 function totalEstrelas(P){ return Object.values(P.paises).reduce((s,x)=>s+(x.estrelas||0),0); }
 function patenteDe(xp){ let i = 0; PATENTES.forEach((p,k)=>{ if(xp>=p.xp) i = k; }); return { i, atual:PATENTES[i], prox:PATENTES[i+1] || null }; }
@@ -62,6 +62,10 @@ const Prog = {
     P.melhorSeq = Math.max(P.melhorSeq, r.melhorSeq);
     if(r.acertos===r.total && r.respondidas===r.total) P.gabaritos++;
     if(r.nivel==="especialista") P.especialista++;
+    // ritmo do jogador: tempo por resposta (todas) e por acerto; guarda as últimas 60
+    const tp = P.tempo || (P.tempo = { n:0, soma:0, acN:0, acSoma:0, recente:[] });
+    (r.tempos||[]).forEach(t=>{ tp.n++; tp.soma += t.seg; if(t.acertou){ tp.acN++; tp.acSoma += t.seg; } tp.recente.push([+t.seg.toFixed(1), t.acertou?1:0]); });
+    tp.recente = tp.recente.slice(-60);
     r.tiposAcertos.forEach(t=>{ P.tipos[t] = (P.tipos[t]||0)+1; });
     r.vistas.forEach(id=>{ P.vistas[id] = (P.vistas[id]||0)+1; });
     const esc = r.escopo;
