@@ -407,6 +407,7 @@ function switchView(name){
   if(name==="config") renderConfig();
   if(name==="auction") renderAuction();
   if(name==="quiz") renderQuiz();
+  if(name==="estudo") renderEstudo();
 }
 
 /* ----------------------------------------------------------------------------

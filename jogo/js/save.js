@@ -27,7 +27,7 @@ const Save = {
         const { work, _sala, ...resto } = e; return { ...resto, ownedId: e.ownedId };
       }),
       agenda: State.agenda, salas: State.salas || {}, emprestimos: State.emprestimos || [],
-      sede: State.sede || null, quizGabaritos: State.quizGabaritos || 0,
+      sede: State.sede || null, quizGabaritos: State.quizGabaritos || 0, estudo: State.estudo || null,
       seenIds: [...(State.seenIds || [])],
       mercado: { mult: Market.mult, hist: Market.hist, day: Market.day },
       missoes: State.missoes || null, album: State.album || null, metricas: State.metricas || null,
@@ -60,7 +60,7 @@ const Save = {
       cash:d.cash, reputation:d.reputation, knowledge:d.knowledge, attemptsLeft:d.attemptsLeft,
       speedSecPerDay:d.speedSecPerDay || 6, nextOwnedId:d.nextOwnedId, nextExpoId:d.nextExpoId,
       collection:d.collection || [], agenda:d.agenda || {}, salas:d.salas || {},
-      emprestimos:d.emprestimos || [], sede:d.sede, quizGabaritos:d.quizGabaritos || 0,
+      emprestimos:d.emprestimos || [], sede:d.sede, quizGabaritos:d.quizGabaritos || 0, estudo:d.estudo || null,
       seenIds:new Set(d.seenIds || []), missoes:d.missoes, album:d.album, metricas:d.metricas,
     });
     // religa cada exposição à obra da coleção; quem estava no ar pousa na hora

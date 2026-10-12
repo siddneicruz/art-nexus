@@ -1906,3 +1906,35 @@ button, .chip, .pick-tile, .hub-porta, .hub-atalho, select{ touch-action:manipul
 @media (max-height:520px) and (pointer:coarse){
   #mapa-aviso{ left:auto; width:min(420px, 52%); } #mapa-cartao{ left:auto; width:min(420px, 52%); max-height:82%; }
 }
+
+
+/* ============ ESTUDAR ARTE ============ */
+.es-chips{ display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 10px; }
+.es-chip{ flex:1 1 120px; padding:10px 8px; border-radius:9px; border:1px solid var(--line); background:var(--panel-2); color:var(--parchment); font-weight:700; font-size:13px; display:flex; flex-direction:column; gap:2px; align-items:center; }
+.es-chip small{ font-weight:500; font-size:11px; color:var(--parchment-dim); }
+.es-chip.sel{ border-color:var(--gold); background:rgba(201,161,59,.14); }
+.es-abas{ display:flex; gap:6px; margin-bottom:14px; border-bottom:1px solid var(--line); }
+.es-abas button{ padding:10px 12px; background:none; border:0; border-bottom:2px solid transparent; color:var(--parchment-dim); font-weight:700; font-size:13.5px; }
+.es-abas button.sel{ color:var(--gold-bright); border-bottom-color:var(--gold); }
+.es-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+.es-card{ text-align:left; padding:14px; border-radius:10px; border:1px solid var(--line); background:var(--panel-2); color:var(--parchment); display:flex; flex-direction:column; gap:4px; }
+.es-card:hover, .es-linha:hover{ border-color:var(--gold); }
+.es-card small, .es-linha small{ color:var(--parchment-dim); font-size:11.5px; display:block; }
+.es-flag{ font-size:26px; }
+.es-bar{ height:4px; border-radius:2px; background:rgba(201,161,59,.18); margin-top:6px; overflow:hidden; }
+.es-bar i{ display:block; height:100%; background:var(--sage); }
+.es-busca{ width:100%; padding:11px 12px; margin-bottom:10px; border-radius:9px; border:1px solid var(--line); background:var(--panel-2); color:var(--parchment); font-size:14px; }
+.es-lista{ display:flex; flex-direction:column; gap:6px; }
+.es-linha{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:11px 13px; border-radius:9px; border:1px solid var(--line); background:var(--panel-2); color:var(--parchment); text-align:left; }
+.es-dom{ min-width:70px; font-size:12px; color:var(--parchment-dim); text-align:right; }
+.quiz-options.duas{ grid-template-columns:1fr 1fr; }
+.es-oculta{ display:flex; align-items:center; justify-content:center; height:120px; font-size:44px; }
+.es-feedback{ margin-top:16px; padding:12px 14px; border-radius:10px; text-align:left; border-left:3px solid var(--line); background:var(--panel-2); }
+.es-feedback.ok{ border-left-color:var(--sage); }
+.es-feedback.erro{ border-left-color:var(--rose); }
+.es-fb-t{ font-weight:700; margin-bottom:6px; }
+.es-fb-txt{ font-size:13.5px; line-height:1.5; }
+.es-fb-btns{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+.es-sair{ margin-top:14px; }
+
+#view-estudo .quiz-img{ max-height:34vh; }

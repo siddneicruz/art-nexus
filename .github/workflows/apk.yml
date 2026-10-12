@@ -1,7 +1,7 @@
 name: Gerar APK
 on:
   push:
-    branches: [main]
+    branches: ['**']
   workflow_dispatch:
 permissions:
   contents: write
@@ -40,5 +40,7 @@ jobs:
         env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk art-nexus.apk
-          gh release delete apk-atual --yes --cleanup-tag || true
-          gh release create apk-atual art-nexus.apk --title "Art Nexus (APK)" --notes "Baixe o art-nexus.apk e instale no Android."
+          TAG=apk-atual; TITULO="Art Nexus (APK)"
+          if [ "$GITHUB_REF_NAME" != "main" ]; then TAG="apk-teste-$GITHUB_REF_NAME"; TITULO="Art Nexus (APK de teste: $GITHUB_REF_NAME)"; fi
+          gh release delete "$TAG" --yes --cleanup-tag || true
+          gh release create "$TAG" art-nexus.apk --target "$GITHUB_SHA" --title "$TITULO" --notes "Baixe o art-nexus.apk e instale no Android."
