@@ -77,6 +77,20 @@ const Musica = {
     this.tocando = true;
     if(this.mudo) return;
     const peca = this.atual();
+    // faixa gravada (mp3): toca o arquivo e, ao terminar, passa para a próxima
+    if(peca.arquivo){
+      const a = new Audio(peca.arquivo); a.volume = 0.6;
+      a.addEventListener("ended", ()=>{ if(this.audio === a && this.tocando && !this.mudo) this.proxima(); });
+      a.addEventListener("error", ()=>{
+        if(this.audio !== a) return;
+        this.audio = null; this.falhas = (this.falhas || 0) + 1;
+        if(this.falhas < 3) this.proxima(); else { this.falhas = 0; const i = PECAS.findIndex(x=>!x.arquivo); if(i >= 0) this.tocar(i); }
+      });
+      this.audio = a;
+      const pr = a.play(); if(pr && pr.catch) pr.catch(()=>{});
+      atualizarControleMusica();
+      return;
+    }
     // começa a síntese na hora (sem silêncio de espera); se existir uma
     // gravação real em assets/musica/, ela assume assim que puder tocar
     this.sintetizar(peca);
@@ -160,6 +174,7 @@ const Musica = {
   },
 
   proxima(){ this.tocar((this.indice + 1) % PECAS.length); },
+  anterior(){ this.tocar((this.indice - 1 + PECAS.length) % PECAS.length); },
   alternarMudo(){
     this.mudo = !this.mudo;
     if(this.mudo){ const eraTocando = this.tocando; this.parar(); this.tocando = eraTocando; }

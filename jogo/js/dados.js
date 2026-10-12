@@ -102,6 +102,7 @@ const Acervo = {
     let n = 0;
     (linhas||[]).forEach(r=>{
       if(!r || !r.id || !r.artista || !r.imagem || r.duplicada || this.porId[r.id]) return;
+      if(typeof TRAD_TITULOS !== "undefined" && TRAD_TITULOS[r.titulo]) r = { ...r, titulo:TRAD_TITULOS[r.titulo] };
       const chaves = this.chavesDe(r.titulo, r.imagem).map(k=>this.norm(r.artista)+"|"+k);
       if(chaves.some(k=>jaTem.has(k))) return;     // mesma obra já presente (título em outro idioma, arquivo repetido...)
       chaves.forEach(k=>jaTem.add(k));

@@ -1,4 +1,5 @@
 /* SALVADOR DALÍ — fatos amplamente conhecidos (Figueres 1904 – Figueres 1989); fichas das obras vêm do acervo.
+   Os títulos das obras são traduzidos em js/traducoes.js (o banco guarda o original).
    As obras estão sob direitos autorais (morreu em 1989): o acervo é do dono do jogo. Datas de obras só quando conferidas na ficha. */
 Mestres.registrar({
   id:"dali", nome:"Salvador Dalí", nomeCurto:"Dalí", icone:"🕰️", sujeito:"Dalí", verbo:"pintou", iniciada:"pintada",
@@ -34,18 +35,18 @@ Mestres.registrar({
   ],
   galeria:{}, galeriaTodas:true,
   catalogo:[
-    { t:"Figure at a Window", fase:"Formação", ano:1925 },
-    { t:"The Basket of Bread", fase:"Formação", ano:1926 },
-    { t:"Fried Egg on the Plate without the Plate", fase:"Surrealista", ano:1932 },
-    { t:"Premonition of Civil War", fase:"Surrealista", ano:1936 },
-    { t:"Lobster Telephone", fase:"Surrealista", ano:1936 },
-    { t:"The Metamorphosis of Narcissus", fase:"Surrealista", ano:1937 },
-    { t:"The Burning Giraffe", fase:"Surrealista", ano:1937 },
-    { t:"Swans Reflecting Elephants", fase:"Surrealista", ano:1937 },
-    { t:"The Temptation of St. Anthony", fase:"Nuclear e místico", ano:1946 },
-    { t:"Leda Atomica", fase:"Nuclear e místico", ano:1949 },
-    { t:"Galatea of the Spheres", fase:"Nuclear e místico", ano:1952 },
-    { t:"The Sacrament of the Last Supper", fase:"Nuclear e místico", ano:1955 },
+    { t:"Figura numa Janela", fase:"Formação", ano:1925 },
+    { t:"A Cesta de Pão", fase:"Formação", ano:1926 },
+    { t:"Ovo Frito no Prato sem o Prato", fase:"Surrealista", ano:1932 },
+    { t:"Premonição da Guerra Civil", fase:"Surrealista", ano:1936 },
+    { t:"Telefone-Lagosta", fase:"Surrealista", ano:1936 },
+    { t:"A Metamorfose de Narciso", fase:"Surrealista", ano:1937 },
+    { t:"A Girafa em Chamas", fase:"Surrealista", ano:1937 },
+    { t:"Cisnes Refletindo Elefantes", fase:"Surrealista", ano:1937 },
+    { t:"A Tentação de Santo Antão", fase:"Nuclear e místico", ano:1946 },
+    { t:"Leda Atômica", fase:"Nuclear e místico", ano:1949 },
+    { t:"Galatea das Esferas", fase:"Nuclear e místico", ano:1952 },
+    { t:"O Sacramento da Última Ceia", fase:"Nuclear e místico", ano:1955 },
     { t:"Santiago El Grande", fase:"Nuclear e místico", ano:1957 },
   ],
   perguntas:{

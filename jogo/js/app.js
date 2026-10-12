@@ -223,6 +223,7 @@ async function iniciar(){
   const ligar = ()=>{ document.removeEventListener("pointerdown", ligar); if(!Musica.tocando && !Musica.mudo) Musica.tocar(0); else Musica.tocando = true; atualizarControleMusica(); };
   document.addEventListener("pointerdown", ligar);
   $("mu-mudo").addEventListener("click", ()=>{ if(!Musica.tocando) Musica.tocando = true; Musica.alternarMudo(); try{ localStorage.setItem("artnexus_mudo", Musica.mudo?"1":"0"); }catch(e){} });
+  $("mu-ant").addEventListener("click", ()=>{ if(Musica.mudo){ Musica.mudo = false; try{ localStorage.setItem("artnexus_mudo","0"); }catch(e){} } Musica.anterior(); });
   $("mu-prox").addEventListener("click", ()=>{ if(Musica.mudo){ Musica.mudo = false; try{ localStorage.setItem("artnexus_mudo","0"); }catch(e){} } Musica.proxima(); });
   document.querySelectorAll("#nav button").forEach(b=>b.addEventListener("click", ()=>{ AudioFX.click(); irPara(b.dataset.v); }));
   irPara("mapa");
