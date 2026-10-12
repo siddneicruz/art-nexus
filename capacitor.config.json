@@ -1,0 +1,7 @@
+{
+  "appId": "com.artnexus.jogo",
+  "appName": "Art Nexus",
+  "webDir": "www",
+  "backgroundColor": "#171310",
+  "android": { "allowMixedContent": false }
+}

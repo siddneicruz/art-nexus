@@ -1,0 +1,14 @@
+Gravações opcionais para a sala de exposição.
+
+Sem arquivos aqui, o jogo sintetiza os temas na hora (funciona sempre).
+Para ouvir orquestras de verdade, coloque gravações EM DOMÍNIO PÚBLICO
+com exatamente estes nomes:
+
+  mozart.mp3     — Eine kleine Nachtmusik, K. 525
+  vivaldi.mp3    — As Quatro Estações, Primavera
+  beethoven.mp3  — Sinfonia nº 5
+  wagner.mp3     — A Cavalgada das Valquírias
+
+Atenção: a composição ser antiga não torna a GRAVAÇÃO livre. Use arquivos
+marcados como domínio público (ou licença livre), por exemplo em
+musopen.org ou commons.wikimedia.org.

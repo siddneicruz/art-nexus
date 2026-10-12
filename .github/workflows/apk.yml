@@ -1,0 +1,45 @@
+name: Gerar APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: android-actions/setup-android@v3
+      - run: npm install
+      - run: node preparar.js
+      - run: npx cap add android
+      - name: Ícone do app e tela cheia
+        run: |
+          sudo apt-get install -y imagemagick >/dev/null
+          R=android/app/src/main/res
+          rm -rf $R/mipmap-anydpi-v26
+          for p in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            d=${p%%:*}; s=${p##*:}
+            for n in ic_launcher ic_launcher_round ic_launcher_foreground; do
+              convert jogo/assets/icone-512.png -resize ${s}x${s} $R/mipmap-$d/$n.png
+            done
+          done
+      - run: npx cap sync android
+      - name: Compilar
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: art-nexus-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publicar em Releases (link fixo para baixar no celular)
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk art-nexus.apk
+          gh release delete apk-atual --yes --cleanup-tag || true
+          gh release create apk-atual art-nexus.apk --title "Art Nexus (APK)" --notes "Baixe o art-nexus.apk e instale no Android."
