@@ -123,9 +123,12 @@ function renderMestres(){
   const el = $("v-mestres");
   if(!mestreAberto){
     el.innerHTML = `<h2 class="sec">Mestres</h2><p class="sub">Trilhas com a vida e a obra de grandes pintores: capítulos, linha do tempo, obras e curiosidades. Cada capítulo concluído libera o próximo.</p>
+      <div class="cn-atalhos"><button class="chip" id="guia-arte">📘 Guia de arte <small>${Conceitos.totalVistos()}/${Conceitos.lista.length}</small></button><button class="chip" id="praticar-cn">🧠 Praticar conceitos</button></div>
       ${Mestres.lista.map(t=>{ const c = t.cfg, n = t.capitulos.length, h = c.hero;
         return `<button class="vg-heroi" data-m="${c.id}" style="display:block;width:100%;text-align:left;background:${h.fundo}"><h2 style="color:${h.cor}">${c.icone} ${c.nome}</h2><p>${h.texto}</p>
           <div class="prog" style="color:${h.cor}">${t.concluidos()}/${n} capítulos · ${t.totalEstrelas()}/${n*3} ★ · ${t.obrasNoAcervo()} obras no acervo</div></button>`; }).join("")}`;
+    $("guia-arte").onclick = ()=>{ AudioFX.click(); abrirGuia(); };
+    $("praticar-cn").onclick = ()=>{ AudioFX.click(); Jogo.comecar({ tipo:"conceitos", valor:"conceitos" }); };
     el.querySelectorAll("[data-m]").forEach(b=>b.addEventListener("click", ()=>{ AudioFX.click(); mestreAberto = b.dataset.m; el.scrollTop = 0; renderMestres(); }));
     return;
   }

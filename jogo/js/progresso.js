@@ -28,11 +28,12 @@ const MEDALHAS = [
 
 // uma medalha por trilha concluída + "estudioso" (3 mestres começados)
 Mestres.lista.forEach(t=>{ if(t.cfg.medalhaFim) MEDALHAS.push({ ...t.cfg.medalhaFim, ok:()=>t.completo() }); });
+MEDALHAS.push({ id:"teorico", icone:"📘", nome:"Teórico da arte", desc:"Conheça 12 conceitos do Guia de arte", ok:()=>Conceitos.totalVistos()>=12 });
 MEDALHAS.push({ id:"estudioso", icone:"📚", nome:"Estudioso", desc:"Conclua capítulos de 3 mestres diferentes", ok:()=>Mestres.lista.filter(t=>t.concluidos()>=1).length>=3 });
 
 function progressoNovo(){
   return { xp:0, rodadas:0, acertos:0, perguntas:0, melhorSeq:0, gabaritos:0, especialista:0, nivel:"iniciante",
-           paises:{}, pintores:{}, vg:{}, vistas:{}, dias:{ ultimo:"", seq:0, melhor:0 }, diario:{ data:"", pontos:0 }, medalhas:{}, tipos:{} };
+           paises:{}, pintores:{}, vg:{}, conceitos:{}, vistas:{}, dias:{ ultimo:"", seq:0, melhor:0 }, diario:{ data:"", pontos:0 }, medalhas:{}, tipos:{} };
 }
 function totalEstrelas(P){ return Object.values(P.paises).reduce((s,x)=>s+(x.estrelas||0),0); }
 function patenteDe(xp){ let i = 0; PATENTES.forEach((p,k)=>{ if(xp>=p.xp) i = k; }); return { i, atual:PATENTES[i], prox:PATENTES[i+1] || null }; }

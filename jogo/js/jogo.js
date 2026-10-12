@@ -8,13 +8,14 @@ function hashTxt(s){ let h = 2166136261; for(let i=0;i<s.length;i++){ h ^= s.cha
 
 const Jogo = {
   esc:null, nivel:"iniciante", fila:[], idx:0, respondidas:0, acertos:0, vidas:3, seq:0, melhorSeq:0, pontos:0,
-  historico:[], respondida:false, t0:0, timer:null, bonusDiario:false,
+  historico:[], respondida:false, conceitosMostrados:new Set(), t0:0, timer:null, bonusDiario:false,
 
   nomeEscopo(e = this.esc){
     if(!e) return "";
     if(e.tipo==="pais") return `${PAISES[e.valor].flag} ${e.valor}`;
     if(e.tipo==="pintor") return `🎨 ${e.valor}`;
     if(e.tipo==="diario") return "📅 Desafio do dia";
+    if(e.tipo==="conceitos") return "📘 Conceitos de arte";
     if(e.tipo==="mestre"){ const t = Mestres.get(e.mestre); return `${t.cfg.icone} ${t.cfg.nomeCurto} · ${t.nomeDe(e.valor)}`; }
     return "🌍 Tudo misturado";
   },
@@ -43,6 +44,7 @@ const Jogo = {
         <div class="intro-anos">${cap.anos} · ${cap.lugar}</div>
         <p class="intro-txt">${cap.resumo}</p>
         ${cap.frase ? `<blockquote class="intro-frase">${cap.frase}</blockquote>` : ""}
+        ${Conceitos.bloco(Conceitos.doCapitulo(T.id, cap.id))}
         ${linha.length ? `<div class="vg-linha">${linha.map(e=>`<div><b>${e.ano}</b><span>${e.curto}</span></div>`).join("")}</div>` : ""}
         <div class="jg-fb-btns" style="justify-content:center;margin-top:18px"><button class="btn ouro" id="intro-ir">Responder ${this.total()} perguntas</button></div>
       </div>`;
@@ -130,15 +132,19 @@ const Jogo = {
     });
     if(q.zoom && el.querySelector("#jg-img")) el.querySelector("#jg-img").innerHTML = this.htmlImagem(q, true);
     const fim = this.vidas<=0 || this.respondidas>=this.total();
+    const cn = Conceitos.paraResposta(q, this.esc, this.conceitosMostrados || (this.conceitosMostrados = new Set()));
+    if(cn){ this.conceitosMostrados.add(cn.id); Conceitos.visto(cn.id); }
     el.querySelector("#jg-fb").innerHTML = `
       <div class="jg-fb ${acertou?"ok":"erro"}">
         <div class="jg-fb-t">${acertou ? `✔ Correto! <span>+${ganho}</span>` : (escolha===null ? "⏱ Tempo esgotado" : "✘ Não foi dessa vez")}${!acertou && q.certa ? `<small>Resposta: ${q.certa}</small>` : ""}</div>
         <div class="jg-fb-txt">${Perguntas.explicar(q)}</div>
+        ${cn ? Conceitos.linhaResposta(cn) : ""}
         <div class="jg-fb-btns">
           ${q.semObra ? "" : `<button class="btn ghost" id="jg-ficha">Ver ficha</button>`}
           <button class="btn ouro" id="jg-prox">${fim ? "Ver resultado" : "Próxima"}</button>
         </div>
       </div>`;
+    el.querySelectorAll(".cn-mais").forEach(b=>b.addEventListener("click", ()=>abrirConceito(b.dataset.cn)));
     el.querySelector("#jg-ficha")?.addEventListener("click", ()=>abrirFicha(q.obra));
     el.querySelector("#jg-prox").addEventListener("click", ()=>{ AudioFX.click(); this.idx++; this.mostrar(); });
     el.querySelector("#jg-fb").scrollIntoView({ block:"nearest", behavior:"smooth" });

@@ -121,6 +121,8 @@ class Trilha {
     const o2 = this.ordemObras(this.cfg.obras.filter(o=>o.cap===id || o.cap===ant), nivel); if(o2) out.push(o2);
     const cap = this.cap(id), gal = this.galeria(nivel).filter(q=>(cap.obras||[]).includes(q.obra.id));
     embaralhar(gal).slice(0,3).forEach(q=>out.push(q));
+    // conceitos ensinados no cartão de abertura do capítulo
+    embaralhar(Conceitos.perguntas(Conceitos.doCapitulo(this.id, id), nivel)).slice(0,2).forEach(q=>out.push(q));
     return out;
   }
 
@@ -130,7 +132,11 @@ class Trilha {
     const v = esc.valor;
     if(this.cap(v)) pool = this.doCapitulo(v, nivel);
     else if(v === "galeria") pool = this.galeria(nivel);
-    else if(v === "estilo") pool = this.cfg.estilo.map(d=>this.montarEscrita(d, nivel)).filter(Boolean);
+    else if(v === "estilo"){
+      pool = this.cfg.estilo.map(d=>this.montarEscrita(d, nivel)).filter(Boolean);
+      const ids = [...new Set(this.capitulos.flatMap(c=>Conceitos.doCapitulo(this.id, c.id)))];
+      embaralhar(Conceitos.perguntas(ids, nivel)).slice(0,6).forEach(q=>pool.push(q));
+    }
     else {
       this.capitulos.forEach(c=>{ embaralhar(this.doCapitulo(c.id, nivel)).slice(0,5).forEach(q=>pool.push(q)); });
       embaralhar(this.cfg.estilo).slice(0,4).forEach(d=>{ const q = this.montarEscrita(d, nivel); if(q) pool.push(q); });
