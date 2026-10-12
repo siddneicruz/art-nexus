@@ -105,7 +105,10 @@ const Musica = {
       if(n !== "-") this.nota(freqNota(n), t, d, peca.timbre);
       t += d; total += d;
     });
-    if(peca.acomp){ let ta = inicio; peca.acomp.forEach(([n, dur])=>{ const d = dur * batida; if(n !== "-" && ta < inicio + total) this.nota(freqNota(n), ta, d, "cordas", .55); ta += d; }); }
+    [[peca.acomp, peca.timbreBaixo || "cordas", .55], [peca.acomp2, "violao", .7]].forEach(([linha, tb, vol])=>{
+      if(!linha) return; let ta = inicio;
+      linha.forEach(([n, dur])=>{ const d = dur * batida; if(n !== "-" && ta < inicio + total) this.nota(freqNota(n), ta, d, tb, vol); ta += d; });
+    });
     // toca a peça duas vezes e passa para a próxima do repertório
     this.voltas = (this.voltas || 0) + 1;
     this.timer = setTimeout(()=>{
@@ -125,6 +128,7 @@ const Musica = {
       piano:    { tipo:"triangle", tons:[[1,.55],[2,.16],[3,.06]], lp:3200, ataque:.008, queda:1.6 },
       harpa:    { tipo:"triangle", tons:[[1,.5],[2,.1]], lp:3600, ataque:.004, queda:1.4 },
       celesta:  { tipo:"sine", tons:[[1,.45],[4,.12]], lp:5000, ataque:.004, queda:1.2 },
+      violao:   { tipo:"triangle", tons:[[1,.5],[2,.18],[3,.08]], lp:2600, ataque:.004, queda:.9 },
       flauta:   { tipo:"sine", tons:[[1,.5],[2,.1]], lp:2800, ataque:.08, sustenta:true },
     }[timbre] || { tipo:"sawtooth", tons:[[1,.45]], lp:1400, ataque:.05, sustenta:true };
     const fim = T.sustenta ? d * .95 : Math.max(Math.min(d * 1.5, T.queda), .2);
