@@ -17,19 +17,20 @@
 <div id="app">
   <header id="topo">
     <div class="brand">DESAFIO DA ARTE <small>teste o que você sabe sobre arte no mundo</small></div>
+    <div id="sv-musica"><span class="mu-titulo">♪ toque para ouvir</span><button id="mu-prox" title="Próxima música">⏭</button><button id="mu-mudo" title="Ligar/desligar música">🔊</button></div>
     <div class="patente"><div class="pt-linha"><b id="pt-nome">Aprendiz</b><span id="pt-xp">0 XP</span></div><div class="barra"><i id="pt-barra"></i></div></div>
   </header>
   <div id="nivelbar"></div>
   <main id="palco">
     <section id="v-mapa" class="view ativa"><div id="mundo"></div><div id="aviso-mapa"></div></section>
-    <section id="v-vangogh" class="view"></section>
+    <section id="v-mestres" class="view"></section>
     <section id="v-pintores" class="view"></section>
     <section id="v-diario" class="view"></section>
     <section id="v-perfil" class="view"></section>
   </main>
   <nav id="nav">
     <button data-v="mapa" class="ativa"><span>🌍</span>Mapa</button>
-    <button data-v="vangogh"><span>🌻</span>Van Gogh</button>
+    <button data-v="mestres"><span>🖌️</span>Mestres</button>
     <button data-v="pintores"><span>🎨</span>Pintores</button>
     <button data-v="diario"><span>📅</span>Diário</button>
     <button data-v="perfil"><span>🏅</span>Perfil</button>
@@ -43,10 +44,16 @@
 <script src="js/artworks-data.js"></script>
 <script src="js/mundo-data.js"></script>
 <script src="js/audio.js"></script>
+<script src="js/musica.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/dados.js"></script>
 <script src="js/perguntas.js"></script>
-<script src="js/vangogh.js"></script>
+<script src="js/trilha.js"></script>
+<script src="js/m-vangogh.js"></script>
+<script src="js/m-leonardo.js"></script>
+<script src="js/m-monet.js"></script>
+<script src="js/m-rembrandt.js"></script>
+<script src="js/m-vermeer.js"></script>
 <script src="js/progresso.js"></script>
 <script src="js/jogo.js"></script>
 <script src="js/app.js"></script>

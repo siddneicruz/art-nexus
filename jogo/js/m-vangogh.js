@@ -1,13 +1,7 @@
-/* ============================================================================
-   VINCENT VAN GOGH — trilha de vida e obra
-   Base factual: https://www.ebiografia.com/van_gogh/ (datas, lugares, pessoas,
-   obras e técnica). Onde a página é contraditória (ex.: "Quarto em Arles"
-   1888/1889, "Pai Tanguy" 1887/1888) a pergunta usa só a data mais aceita ou
-   nem entra. Frases marcadas como "carta" são trechos de cartas a Theo em
-   tradução livre.
-   Estrutura: 9 capítulos (juventude → morte) + 3 modos extras.
-   ============================================================================ */
-
+/* VINCENT VAN GOGH — dados da trilha.
+   Base factual: https://www.ebiografia.com/van_gogh/ (datas, lugares, pessoas, obras e técnica).
+   Onde a página é contraditória ("Quarto em Arles" 1888/1889, "Pai Tanguy" 1887/1888) a pergunta usa
+   só a data mais aceita ou nem entra. Frases marcadas "carta" são trechos de cartas a Theo, em tradução livre. */
 const VG_CAPITULOS = [
   { id:"zundert", n:1, icone:"🌾", titulo:"Zundert", anos:"1853–1869", lugar:"Zundert, Países Baixos",
     resumo:"Vincent Willem van Gogh nasce em 30 de março de 1853, numa pequena aldeia holandesa, filho de um pastor calvinista. Criança rebelde e pouco sociável, ganha na infância o irmão que será o amor da sua vida: Theo.",
@@ -210,135 +204,13 @@ const VG_ESTILO = [
   { t:"carta", q:"A quem eram dirigidas as cartas que hoje documentam a vida de Van Gogh?", c:"Ao irmão Theo", e:["Ao pai","A Gauguin","Ao Dr. Gachet","A Mauve"], d:"Theo foi seu confidente e apoio financeiro durante a vida de artista." },
 ];
 
-const Vangogh = {
-  capitulos: VG_CAPITULOS,
-  extras: [
-    { id:"galeria", icone:"🖼️", titulo:"Galeria de obras", desc:"Reconheça títulos, anos e fases em telas do acervo" },
-    { id:"estilo",  icone:"💬", titulo:"Estilo e pensamento", desc:"Técnica, frases e cartas a Theo" },
-    { id:"jornada", icone:"🧭", titulo:"Jornada completa", desc:"Toda a vida e obra, misturadas" },
-  ],
-
-  cap(id){ return VG_CAPITULOS.find(c=>c.id===id); },
-  nomeDe(id){ const c = this.cap(id); if(c) return `${c.icone} ${c.titulo}`; const e = this.extras.find(x=>x.id===id); return e ? `${e.icone} ${e.titulo}` : "Van Gogh"; },
-  estado(){ return (Prog.P.vg || (Prog.P.vg = {})); },
-  estrelas(id){ return (this.estado()[id] || {}).estrelas || 0; },
-  totalEstrelas(){ return VG_CAPITULOS.reduce((s,c)=>s+this.estrelas(c.id),0); },
-  concluidos(){ return VG_CAPITULOS.filter(c=>this.estrelas(c.id)>=1).length; },
-  liberado(id){
-    const i = VG_CAPITULOS.findIndex(c=>c.id===id);
-    if(i === 0) return true;
-    if(i > 0) return this.estrelas(VG_CAPITULOS[i-1].id) >= 1;
-    return this.concluidos() >= 3; // extras
-  },
-  proximo(id){ const i = VG_CAPITULOS.findIndex(c=>c.id===id); return i>=0 ? VG_CAPITULOS[i+1] || null : null; },
-  linhaDoCapitulo(id){ return VG_EVENTOS.filter(e=>e.cap===id).sort((a,b)=>a.ano-b.ano); },
-  obrasDo(id){ const c = this.cap(id); return c ? c.obras.map(i=>Acervo.porId[i]).filter(Boolean) : []; },
-
-  /* ---------- geração ---------- */
-  montarEscrita(d, nivel){
-    const n = NIVEIS[nivel].opcoes - 1;
-    const obra = d.obra ? Acervo.porId[d.obra] : null;
-    if(d.obra && !obra) return null;
-    const erradas = embaralhar(d.e).slice(0, n);
-    const opcoes = embaralhar([d.c, ...erradas]);
-    return { tipo:"vg-"+d.t, texto:d.q, certa:d.c, opcoes, detalhe:d.d, custom:true,
-      obra, imagem:!!obra, semObra:!obra, longo: opcoes.some(o=>o.length>34) };
-  },
-  anosProximos(ano, qtd){
-    const set = new Set();
-    for(const k of embaralhar([-1,1,-2,2,-3,3,-4,4,-5,5,-7,7,-9,9,-12,12])){
-      const v = ano + k; if(v>=1850 && v<=1892) set.add(v);
-      if(set.size >= qtd) break;
-    }
-    return [...set];
-  },
-  perguntaAnoEvento(ev, nivel){
-    const n = NIVEIS[nivel].opcoes - 1;
-    const errados = this.anosProximos(ev.ano, n).map(String);
-    return { tipo:"vg-linha", texto:ev.q, certa:String(ev.ano), opcoes:embaralhar([String(ev.ano), ...errados]), custom:true, semObra:true,
-      detalhe:`${ev.ano}: ${ev.curto}.` };
-  },
-  perguntaOrdem(lista, rotulo, ano, nivel, rotuloDet){
-    // lista de itens {ano, rotulo}; devolve "qual veio primeiro/por último"
-    const n = Math.min(NIVEIS[nivel].opcoes, 4);
-    const vistos = new Set(), unicos = [];
-    embaralhar(lista).forEach(x=>{ if(!vistos.has(ano(x))){ vistos.add(ano(x)); unicos.push(x); } });
-    if(unicos.length < 3) return null;
-    const grupo = unicos.slice(0, n), primeiro = Math.random() < 0.5;
-    const alvo = grupo.reduce((a,b)=> (primeiro ? ano(b)<ano(a) : ano(b)>ano(a)) ? b : a);
-    return { tipo:"vg-linha", texto:rotuloDet(primeiro), certa:rotulo(alvo), opcoes:embaralhar(grupo.map(rotulo)), custom:true, semObra:true,
-      detalhe: grupo.slice().sort((a,b)=>ano(a)-ano(b)).map(x=>`${ano(x)} — ${rotulo(x)}`).join("<br>"), longo:true };
-  },
-  ordemEventos(evs, nivel){
-    return this.perguntaOrdem(evs, e=>e.curto, e=>e.ano, nivel, p=>p ? "Qual destes acontecimentos veio primeiro?" : "Qual destes acontecimentos veio por último?");
-  },
-  ordemObras(obras, nivel){
-    return this.perguntaOrdem(obras, o=>o.t, o=>o.a, nivel, p=>p ? "Qual destas obras foi pintada primeiro?" : "Qual destas obras foi pintada por último?");
-  },
-  obraDeAno(nivel){
-    const n = NIVEIS[nivel].opcoes - 1, alvo = embaralhar(VG_OBRAS)[0];
-    const outras = embaralhar(VG_OBRAS.filter(o=>o.a !== alvo.a)).slice(0, n);
-    return { tipo:"vg-linha", texto:`Qual destas obras Van Gogh pintou em ${alvo.a}?`, certa:alvo.t, opcoes:embaralhar([alvo.t, ...outras.map(o=>o.t)]), custom:true, semObra:true,
-      detalhe:`${alvo.t} é de ${alvo.a}.` , longo:true };
-  },
-  galeria(nivel){
-    const ids = Object.keys(VG_GALERIA).filter(id=>Acervo.porId[id]);
-    const out = [];
-    const n = NIVEIS[nivel].opcoes - 1;
-    const todos = ids.map(id=>Acervo.porId[id]);
-    ids.forEach(id=>{
-      const o = Acervo.porId[id], g = VG_GALERIA[id];
-      // título
-      out.push({ tipo:"vg-obra", texto:"Qual é o título desta obra de Van Gogh?", certa:o.titulo,
-        opcoes:embaralhar([o.titulo, ...embaralhar(todos.filter(x=>x.id!==id).map(x=>x.titulo)).slice(0,n)]),
-        custom:true, obra:o, imagem:true, longo:true,
-        detalhe:`${o.titulo} — ${g.ano}${o.museu ? ` · 🏛 ${o.museu}` : ""}` });
-      // ano
-      out.push({ tipo:"vg-obra", texto:"Em que ano Van Gogh pintou esta obra?", certa:String(g.ano),
-        opcoes:embaralhar([String(g.ano), ...this.anosProximos(g.ano, n).map(String)]),
-        custom:true, obra:o, imagem:true, detalhe:`${o.titulo} é de ${g.ano}.` });
-      // fase/cidade
-      out.push({ tipo:"vg-obra", texto:"Em que cidade ou fase da vida de Van Gogh esta obra foi pintada?", certa:g.fase,
-        opcoes:embaralhar([g.fase, ...embaralhar(VG_FASES.filter(f=>f!==g.fase)).slice(0,n)]),
-        custom:true, obra:o, imagem:true, detalhe:`${o.titulo} foi pintada em ${g.fase}, em ${g.ano}.` });
-    });
-    return out;
-  },
-  doCapitulo(id, nivel){
-    const out = [];
-    (VG_PERGUNTAS[id] || []).forEach(d=>{ const q = this.montarEscrita(d, nivel); if(q) out.push(q); });
-    const evs = this.linhaDoCapitulo(id);
-    evs.forEach(e=>out.push(this.perguntaAnoEvento(e, nivel)));
-    // ordem entre acontecimentos: usa o capítulo e o anterior
-    const i = VG_CAPITULOS.findIndex(c=>c.id===id);
-    const vizinhos = VG_EVENTOS.filter(e=>[id, (VG_CAPITULOS[i-1]||{}).id].includes(e.cap));
-    const o1 = this.ordemEventos(vizinhos, nivel); if(o1) out.push(o1);
-    const obrasCap = VG_OBRAS.filter(o=>o.cap===id);
-    if(obrasCap.length >= 1){
-      const o2 = this.ordemObras(VG_OBRAS.filter(o=>[id, (VG_CAPITULOS[i-1]||{}).id].includes(o.cap)), nivel); if(o2) out.push(o2);
-    }
-    // obras do acervo deste capítulo (título/ano/fase)
-    const galeria = this.galeria(nivel).filter(q=>this.cap(id).obras.includes(q.obra.id));
-    embaralhar(galeria).slice(0,2).forEach(q=>out.push(q));
-    return out;
-  },
-
-  /* fila para o motor do jogo (esc = {tipo:"vangogh", valor:id}) */
-  fila(esc, nivel, qtd){
-    let pool = [];
-    if(this.cap(esc.valor)) pool = this.doCapitulo(esc.valor, nivel);
-    else if(esc.valor === "galeria") pool = this.galeria(nivel);
-    else if(esc.valor === "estilo") pool = VG_ESTILO.map(d=>this.montarEscrita(d, nivel)).filter(Boolean);
-    else { // jornada
-      VG_CAPITULOS.forEach(c=>{ embaralhar(this.doCapitulo(c.id, nivel)).slice(0,5).forEach(q=>pool.push(q)); });
-      embaralhar(VG_ESTILO).slice(0,4).forEach(d=>{ const q = this.montarEscrita(d, nivel); if(q) pool.push(q); });
-      const o = this.ordemEventos(VG_EVENTOS, nivel); if(o) pool.push(o);
-      const o2 = this.ordemObras(VG_OBRAS, nivel); if(o2) pool.push(o2);
-      pool.push(this.obraDeAno(nivel));
-    }
-    // sem repetir texto; mistura os tipos
-    const vistos = new Set();
-    pool = embaralhar(pool).filter(q=>{ const k = q.texto+"|"+q.certa+"|"+(q.obra ? q.obra.id : ""); if(vistos.has(k)) return false; vistos.add(k); return true; });
-    return pool.slice(0, qtd);
-  },
-};
+Mestres.registrar({
+  id:"vangogh", nome:"Vincent van Gogh", nomeCurto:"Van Gogh", icone:"🌻", sujeito:"Vincent", verbo:"pintou", iniciada:"pintada",
+  hero:{ texto:"Da aldeia de Zundert aos campos de trigo de Auvers: viva a vida do artista capítulo a capítulo, com linha do tempo, obras, técnica e frases das cartas a Theo.",
+         fundo:"linear-gradient(160deg,#1c2a52 0%,#2b3f7a 45%,#d8a81f 130%)", cor:"#ffe08a" },
+  capitulos:VG_CAPITULOS, eventos:VG_EVENTOS, obras:VG_OBRAS, galeria:VG_GALERIA, fases:VG_FASES, perguntas:VG_PERGUNTAS, estilo:VG_ESTILO,
+  estiloTitulo:"Estilo e pensamento", estiloDesc:"Técnica, frases e cartas a Theo",
+  textoFase:"Em que cidade ou fase da vida de Van Gogh esta obra foi pintada?",
+  anoMin:1850, anoMax:1892, liberaExtras:3,
+  medalhaFim:{ id:"vg9", icone:"💌", nome:"Amigo de Theo", desc:"Conclua os 9 capítulos da vida de Van Gogh" },
+});

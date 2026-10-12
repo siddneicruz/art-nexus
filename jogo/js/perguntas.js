@@ -58,7 +58,7 @@ const Perguntas = {
   },
 
   fila(esc, nivel, qtd, rnd=Math.random){
-    if(esc.tipo==="vangogh") return Vangogh.fila(esc, nivel, qtd);
+    if(esc.tipo==="mestre") return Mestres.get(esc.mestre).fila(esc, nivel, qtd);
     const obras = this.selecionar(esc, qtd, rnd);
     const contagem = {};
     const out = [];

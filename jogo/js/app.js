@@ -51,7 +51,7 @@ function fecharFolha(){ $("folha").classList.remove("aberta"); }
 function renderTudo(){
   updateTopo(); renderNiveis();
   if(viewAtual==="mapa") renderMapa();
-  if(viewAtual==="vangogh") renderVG();
+  if(viewAtual==="mestres") renderMestres();
   if(viewAtual==="pintores") renderPintores();
   if(viewAtual==="diario") renderDiario();
   if(viewAtual==="perfil") renderPerfil();
@@ -117,28 +117,38 @@ function renderPintores(){
   el.querySelectorAll(".pintor").forEach(b=>b.addEventListener("click", ()=>{ AudioFX.click(); Jogo.comecar({ tipo:"pintor", valor:lista[+b.dataset.i].nome }); }));
 }
 
-/* ---------------- trilha Van Gogh ---------------- */
-function renderVG(){
-  const el = $("v-vangogh"), tot = Vangogh.totalEstrelas();
-  const obras = Acervo.obras.filter(o=>/gogh/i.test(o.artista)).length;
-  el.innerHTML = `<div class="vg-heroi"><h2>🌻 Vincent van Gogh</h2>
-      <p>Da aldeia de Zundert aos campos de trigo de Auvers: viva a vida do artista capítulo a capítulo, com linha do tempo, obras, técnica e frases das cartas a Theo.</p>
-      <div class="prog">${Vangogh.concluidos()}/9 capítulos · ${tot}/27 ★ · ${obras} obras no acervo</div></div>
+/* ---------------- mestres (trilhas de vida e obra) ---------------- */
+let mestreAberto = null;
+function renderMestres(){
+  const el = $("v-mestres");
+  if(!mestreAberto){
+    el.innerHTML = `<h2 class="sec">Mestres</h2><p class="sub">Trilhas com a vida e a obra de grandes pintores: capítulos, linha do tempo, obras e curiosidades. Cada capítulo concluído libera o próximo.</p>
+      ${Mestres.lista.map(t=>{ const c = t.cfg, n = t.capitulos.length, h = c.hero;
+        return `<button class="vg-heroi" data-m="${c.id}" style="display:block;width:100%;text-align:left;background:${h.fundo}"><h2 style="color:${h.cor}">${c.icone} ${c.nome}</h2><p>${h.texto}</p>
+          <div class="prog" style="color:${h.cor}">${t.concluidos()}/${n} capítulos · ${t.totalEstrelas()}/${n*3} ★ · ${t.obrasNoAcervo()} obras no acervo</div></button>`; }).join("")}`;
+    el.querySelectorAll("[data-m]").forEach(b=>b.addEventListener("click", ()=>{ AudioFX.click(); mestreAberto = b.dataset.m; el.scrollTop = 0; renderMestres(); }));
+    return;
+  }
+  const T = Mestres.get(mestreAberto), c = T.cfg, n = T.capitulos.length, lim = c.liberaExtras || 3;
+  el.innerHTML = `<button class="chip" id="m-voltar" style="margin-bottom:10px">← Todos os mestres</button>
+    <div class="vg-heroi" style="background:${c.hero.fundo}"><h2 style="color:${c.hero.cor}">${c.icone} ${c.nome}</h2><p>${c.hero.texto}</p>
+      <div class="prog" style="color:${c.hero.cor}">${T.concluidos()}/${n} capítulos · ${T.totalEstrelas()}/${n*3} ★ · ${T.obrasNoAcervo()} obras no acervo</div></div>
     <div class="sep">Vida e obra</div>
-    ${Vangogh.capitulos.map(c=>{
-      const lib = Vangogh.liberado(c.id), est = Vangogh.estrelas(c.id);
-      return `<button class="cap ${lib?"":"trava"} ${lib && !est ? "novo":""}" data-id="${c.id}"><div class="ic">${lib ? c.icone : "🔒"}</div>
-        <div><b>${c.n}. ${c.titulo}</b><small>${c.anos} · ${c.lugar}</small></div>
+    ${T.capitulos.map(k=>{
+      const lib = T.liberado(k.id), est = T.estrelas(k.id);
+      return `<button class="cap ${lib?"":"trava"} ${lib && !est ? "novo":""}" data-id="${k.id}"><div class="ic">${lib ? k.icone : "🔒"}</div>
+        <div><b>${k.n}. ${k.titulo}</b><small>${k.anos} · ${k.lugar}</small></div>
         <div class="est">${lib ? estrelasHtml(est) : ""}</div></button>`; }).join("")}
-    <div class="sep">Modos especiais ${Vangogh.concluidos()<3 ? "· libere concluindo 3 capítulos" : ""}</div>
-    ${Vangogh.extras.map(x=>{
-      const lib = Vangogh.liberado(x.id), est = Vangogh.estrelas(x.id);
+    <div class="sep">Modos especiais ${T.concluidos()<lim ? `· libere concluindo ${lim} capítulo${lim>1?"s":""}` : ""}</div>
+    ${T.extras.map(x=>{
+      const lib = T.liberado(x.id), est = T.estrelas(x.id);
       return `<button class="cap ${lib?"":"trava"}" data-id="${x.id}"><div class="ic">${lib ? x.icone : "🔒"}</div>
         <div><b>${x.titulo}</b><small>${x.desc}</small></div><div class="est">${lib ? estrelasHtml(est) : ""}</div></button>`; }).join("")}`;
+  $("m-voltar").onclick = ()=>{ mestreAberto = null; renderMestres(); };
   el.querySelectorAll(".cap").forEach(b=>b.addEventListener("click", ()=>{
     const id = b.dataset.id;
-    if(!Vangogh.liberado(id)) return toast("Conclua o capítulo anterior (5 acertos ou mais) para liberar este.");
-    AudioFX.click(); Jogo.comecar({ tipo:"vangogh", valor:id });
+    if(!T.liberado(id)) return toast("Conclua o capítulo anterior (metade de acertos ou mais) para liberar este.");
+    AudioFX.click(); Jogo.comecar({ tipo:"mestre", mestre:T.id, valor:id });
   }));
 }
 
@@ -172,6 +182,13 @@ function renderPerfil(){
 /* ---------------- início ---------------- */
 async function iniciar(){
   Acervo.iniciar(); Prog.carregar();
+  // música das exposições: começa no primeiro toque (o navegador exige um gesto); preferência de silêncio fica salva
+  try{ Musica.mudo = localStorage.getItem("artnexus_mudo")==="1"; }catch(e){}
+  atualizarControleMusica();
+  const ligar = ()=>{ document.removeEventListener("pointerdown", ligar); if(!Musica.tocando && !Musica.mudo) Musica.tocar(0); else Musica.tocando = true; atualizarControleMusica(); };
+  document.addEventListener("pointerdown", ligar);
+  $("mu-mudo").addEventListener("click", ()=>{ if(!Musica.tocando) Musica.tocando = true; Musica.alternarMudo(); try{ localStorage.setItem("artnexus_mudo", Musica.mudo?"1":"0"); }catch(e){} });
+  $("mu-prox").addEventListener("click", ()=>{ if(Musica.mudo){ Musica.mudo = false; try{ localStorage.setItem("artnexus_mudo","0"); }catch(e){} } Musica.proxima(); });
   document.querySelectorAll("#nav button").forEach(b=>b.addEventListener("click", ()=>{ AudioFX.click(); irPara(b.dataset.v); }));
   irPara("mapa");
   try{

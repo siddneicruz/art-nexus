@@ -15,7 +15,7 @@ const Jogo = {
     if(e.tipo==="pais") return `${PAISES[e.valor].flag} ${e.valor}`;
     if(e.tipo==="pintor") return `🎨 ${e.valor}`;
     if(e.tipo==="diario") return "📅 Desafio do dia";
-    if(e.tipo==="vangogh") return "🌻 Van Gogh · " + Vangogh.nomeDe(e.valor);
+    if(e.tipo==="mestre"){ const t = Mestres.get(e.mestre); return `${t.cfg.icone} ${t.cfg.nomeCurto} · ${t.nomeDe(e.valor)}`; }
     return "🌍 Tudo misturado";
   },
 
@@ -27,16 +27,16 @@ const Jogo = {
     Object.assign(this, { esc, nivel, fila, idx:0, respondidas:0, acertos:0, vidas:NIVEIS[nivel].vidas, seq:0, melhorSeq:0, pontos:0,
       historico:[], respondida:false, bonusDiario: esc.tipo==="diario" && Prog.P.diario.data !== hoje() });
     document.getElementById("tela-jogo").classList.add("aberta");
-    const cap = esc.tipo==="vangogh" ? Vangogh.cap(esc.valor) : null;
+    const cap = esc.tipo==="mestre" ? Mestres.get(esc.mestre).cap(esc.valor) : null;
     if(cap && !semIntro) this.intro(cap); else this.mostrar();
   },
 
   // cartão de abertura de um capítulo da trilha Van Gogh
   intro(cap){
     const el = document.getElementById("tela-jogo");
-    const linha = Vangogh.linhaDoCapitulo(cap.id);
+    const T = Mestres.get(this.esc.mestre), linha = T.linhaDoCapitulo(cap.id);
     el.innerHTML = `
-      <div class="jg-topo"><button class="jg-x" id="jg-sair">✕</button><div class="jg-sub" style="margin:0">Capítulo ${cap.n} de 9</div><span></span></div>
+      <div class="jg-topo"><button class="jg-x" id="jg-sair">✕</button><div class="jg-sub" style="margin:0">Capítulo ${cap.n} de ${T.capitulos.length}</div><span></span></div>
       <div class="jg-corpo intro">
         <div class="intro-ico">${cap.icone}</div>
         <h2 class="intro-tit">${cap.titulo}</h2>
@@ -189,17 +189,17 @@ const Jogo = {
     el.querySelector("#jg-sair").addEventListener("click", ()=>this.sair());
     el.querySelector("#res-voltar").addEventListener("click", ()=>this.sair());
     el.querySelector("#res-de-novo").addEventListener("click", ()=>{ AudioFX.click(); this.comecar(this.esc, true); });
-    el.querySelector("#res-prox")?.addEventListener("click", ()=>{ AudioFX.click(); this.comecar({ tipo:"vangogh", valor:el.querySelector("#res-prox").dataset.id }); });
+    el.querySelector("#res-prox")?.addEventListener("click", ()=>{ AudioFX.click(); this.comecar({ tipo:"mestre", mestre:this.esc.mestre, valor:el.querySelector("#res-prox").dataset.id }); });
     el.querySelectorAll(".res-obra").forEach(b=>b.addEventListener("click", ()=>abrirFicha(vistas[+b.dataset.i])));
     updateTopo();
   },
 };
 
 Jogo.blocoVG = function(estrelas){
-  if(!this.esc || this.esc.tipo!=="vangogh") return "";
-  const cap = Vangogh.cap(this.esc.valor);
+  if(!this.esc || this.esc.tipo!=="mestre") return "";
+  const T = Mestres.get(this.esc.mestre), cap = T.cap(this.esc.valor);
   if(!cap) return "";
-  const linha = Vangogh.linhaDoCapitulo(cap.id), prox = Vangogh.proximo(cap.id);
+  const linha = T.linhaDoCapitulo(cap.id), prox = T.proximo(cap.id);
   return `<div class="vg-fecho">
       <h3 class="res-sec">Linha do tempo · ${cap.titulo}</h3>
       <div class="vg-linha">${linha.map(e=>`<div><b>${e.ano}</b><span>${e.curto}</span></div>`).join("")}</div>

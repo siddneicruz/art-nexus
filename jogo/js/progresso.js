@@ -23,9 +23,12 @@ const MEDALHAS = [
   { id:"album",     icone:"🖼️", nome:"Colecionador",     desc:"Conheça 50 obras",                   ok:P=>Object.keys(P.vistas).length>=50 },
   { id:"especial",  icone:"🎓", nome:"Especialista",     desc:"Termine uma rodada no nível Especialista", ok:P=>P.especialista>=1 },
   { id:"vg3",       icone:"🌻", nome:"Aprendiz de Vincent", desc:"Conclua 3 capítulos da trilha Van Gogh", ok:P=>Object.values(P.vg||{}).filter(x=>x.estrelas>=1).length>=3 },
-  { id:"vg9",       icone:"💌", nome:"Amigo de Theo",    desc:"Conclua os 9 capítulos da vida de Van Gogh", ok:P=>Object.values(P.vg||{}).filter(x=>x.estrelas>=1).length>=9 },
   { id:"dias7",     icone:"📅", nome:"Hábito de arte",   desc:"7 dias seguidos jogando",            ok:P=>P.dias.melhor>=7 },
 ];
+
+// uma medalha por trilha concluída + "estudioso" (3 mestres começados)
+Mestres.lista.forEach(t=>{ if(t.cfg.medalhaFim) MEDALHAS.push({ ...t.cfg.medalhaFim, ok:()=>t.completo() }); });
+MEDALHAS.push({ id:"estudioso", icone:"📚", nome:"Estudioso", desc:"Conclua capítulos de 3 mestres diferentes", ok:()=>Mestres.lista.filter(t=>t.concluidos()>=1).length>=3 });
 
 function progressoNovo(){
   return { xp:0, rodadas:0, acertos:0, perguntas:0, melhorSeq:0, gabaritos:0, especialista:0, nivel:"iniciante",
@@ -65,8 +68,9 @@ const Prog = {
       const x = P.paises[esc.valor] || (P.paises[esc.valor] = { estrelas:0, melhor:0, jogadas:0 });
       x.jogadas++; x.melhor = Math.max(x.melhor, r.pontos); x.estrelas = Math.max(x.estrelas, r.estrelas);
     }
-    if(esc.tipo==="vangogh"){
-      const x = P.vg[esc.valor] || (P.vg[esc.valor] = { estrelas:0, melhor:0, jogadas:0 });
+    if(esc.tipo==="mestre"){
+      const k = Mestres.get(esc.mestre).chave(esc.valor);
+      const x = P.vg[k] || (P.vg[k] = { estrelas:0, melhor:0, jogadas:0 });
       x.jogadas++; x.melhor = Math.max(x.melhor, r.pontos); x.estrelas = Math.max(x.estrelas, r.estrelas);
     }
     if(esc.tipo==="pintor"){
