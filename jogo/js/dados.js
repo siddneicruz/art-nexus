@@ -122,15 +122,19 @@ const Acervo = {
     if(!c || !c.url || !c.anonKey) return 0;
     let linhas = null;
     try{
-      const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), 12000);
-      const r = await fetch(`${c.url}/rest/v1/obras?select=id,titulo,artista,pais,tier,movimento,imagem,duplicada&duplicada=eq.false&limit=5000`,
-        { headers:{ apikey:c.anonKey, Authorization:`Bearer ${c.anonKey}` }, signal:ctl.signal });
-      clearTimeout(t);
-      if(!r.ok) throw new Error("HTTP "+r.status);
-      linhas = await r.json();
-      try{ localStorage.setItem("artnexus_nuvem_v4", JSON.stringify(linhas)); }catch(e){}
+      linhas = [];
+      for(let ini=0; ini<20000; ini+=1000){
+        const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), 15000);
+        const r = await fetch(`${c.url}/rest/v1/obras?select=id,titulo,artista,pais,tier,movimento,imagem,duplicada&duplicada=eq.false&order=id.asc`,
+          { headers:{ apikey:c.anonKey, Authorization:`Bearer ${c.anonKey}`, Range:`${ini}-${ini+999}`, "Range-Unit":"items" }, signal:ctl.signal });
+        clearTimeout(t);
+        if(!r.ok) throw new Error("HTTP "+r.status);
+        const pag = await r.json(); linhas.push(...pag);
+        if(pag.length < 1000) break;
+      }
+      try{ localStorage.setItem("artnexus_nuvem_v5", JSON.stringify(linhas)); }catch(e){}
     }catch(e){
-      try{ linhas = JSON.parse(localStorage.getItem("artnexus_nuvem_v4")); }catch(_){}
+      try{ linhas = JSON.parse(localStorage.getItem("artnexus_nuvem_v5")); }catch(_){}
     }
     return Array.isArray(linhas) ? this.incorporarNuvem(linhas) : 0;
   },

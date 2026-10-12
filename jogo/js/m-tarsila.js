@@ -48,7 +48,7 @@ Mestres.registrar({
     { t:"Operários", a:1933, cap:"social" },
     { t:"Fazenda", a:1950, cap:"social" },
   ],
-  galeria:{},
+  galeria:{}, galeriaTodas:true,
   // catálogo só em texto: título, fase e ano (quando a página oficial informa). Sem imagens: direitos autorais.
   catalogo:[
     { t:"Sagrado Coração de Jesus", fase:null, ano:1904 },

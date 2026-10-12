@@ -29,6 +29,8 @@ class Trilha {
         const e = porTitulo.get(norm(o.titulo)); if(e) g[o.id] = { ano:e.ano, fase:e.fase || undefined };
       });
     }
+    /* galeriaTodas: toda obra do pintor no acervo entra na galeria (reconhecer o título), mesmo fora do catálogo */
+    if(this.cfg.galeriaTodas) Acervo.obras.filter(o=>o.artista === this.cfg.artista && !g[o.id]).forEach(o=>{ g[o.id] = {}; });
     return g;
   }
 
