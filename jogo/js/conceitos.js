@@ -242,6 +242,7 @@ const CAP_CONCEITOS = {
   "turner:londres":["desenho"],
   "turner:academia":["paisagem"],
   "turner:maturidade":["romantismo","paisagem"],
+  "turner:veneza":["romantismo","paisagem"],
   "turner:legado":["romantismo","impressionismo"],
   "monet:havre":["arlivre"],
   "monet:londres":["paisagem","barbizon"],

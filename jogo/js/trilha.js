@@ -30,7 +30,11 @@ class Trilha {
       });
     }
     /* galeriaTodas: toda obra do pintor no acervo entra na galeria (reconhecer o título), mesmo fora do catálogo */
-    if(this.cfg.galeriaTodas) Acervo.obras.filter(o=>o.artista === this.cfg.artista && !g[o.id]).forEach(o=>{ g[o.id] = {}; });
+    if(this.cfg.galeriaTodas) Acervo.obras.filter(o=>o.artista === this.cfg.artista && !g[o.id]).forEach(o=>{
+      /* faseDoAno (opcional): deriva a fase do ano; só vale para ano preciso */
+      const precisa = o.anoPreciso && o.ano;
+      g[o.id] = this.cfg.faseDoAno ? { ano:precisa ? o.ano : undefined, fase:precisa ? this.cfg.faseDoAno(o.ano) : undefined, onde:o.museu || undefined, tecnica:o.tecnica || undefined } : {};
+    });
     return g;
   }
 
@@ -152,8 +156,8 @@ class Trilha {
     const i = this.capitulos.findIndex(c=>c.id===id), ant = (this.capitulos[i-1]||{}).id;
     const o1 = this.ordemEventos(this.cfg.eventos.filter(e=>e.cap===id || e.cap===ant), nivel); if(o1) out.push(o1);
     const o2 = this.ordemObras(this.cfg.obras.filter(o=>o.cap===id || o.cap===ant), nivel); if(o2) out.push(o2);
-    const cap = this.cap(id), gal = this.galeria(nivel).filter(q=>(cap.obras||[]).includes(q.obra.id));
-    embaralhar(gal).slice(0,3).forEach(q=>out.push(q));
+    const cap = this.cap(id), gal = this.galeria(nivel).filter(q=>(cap.obras||[]).includes(q.obra.id) || (cap.faixa && q.obra.anoPreciso && q.obra.ano >= cap.faixa[0] && q.obra.ano <= cap.faixa[1]));
+    embaralhar(gal).slice(0, cap.nGaleria || 3).forEach(q=>out.push(q));
     // conceitos ensinados no cartão de abertura do capítulo
     embaralhar(Conceitos.perguntas(Conceitos.doCapitulo(this.id, id), nivel)).slice(0,2).forEach(q=>out.push(q));
     return out;
