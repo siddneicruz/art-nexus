@@ -137,9 +137,9 @@ const Acervo = {
         const pag = await r.json(); linhas.push(...pag);
         if(pag.length < 1000) break;
       }
-      try{ localStorage.setItem("artnexus_nuvem_v6", JSON.stringify(linhas)); }catch(e){}
+      try{ localStorage.setItem("artnexus_nuvem_v7", JSON.stringify(linhas)); }catch(e){}
     }catch(e){
-      try{ linhas = JSON.parse(localStorage.getItem("artnexus_nuvem_v6")); }catch(_){}
+      try{ linhas = JSON.parse(localStorage.getItem("artnexus_nuvem_v7")); }catch(_){}
     }
     return Array.isArray(linhas) ? this.incorporarNuvem(linhas) : 0;
   },
