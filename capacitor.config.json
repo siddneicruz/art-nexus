@@ -3,5 +3,12 @@
   "appName": "Desafio da Arte",
   "webDir": "www",
   "backgroundColor": "#171310",
-  "android": { "allowMixedContent": false }
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "CapacitorUpdater": {
+      "autoUpdate": false
+    }
+  }
 }
