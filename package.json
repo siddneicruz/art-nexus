@@ -9,6 +9,6 @@
     "@capacitor/android": "^6.1.2",
     "@capacitor/cli": "^6.1.2",
     "@capacitor/core": "^6.1.2",
-    "@capgo/capacitor-updater": "6.14.17"
+    "@capgo/capacitor-updater": "6.1.0"
   }
 }
