@@ -115,11 +115,11 @@ const Perguntas = {
     switch(t){
       case "autor": {
         const perto = todas.filter(w=>w.pais===o.pais || (o.movimento && w.movimento===o.movimento)).map(w=>w.artista);
-        return mk("Quem pintou esta obra?", o.artista, distratores(o.artista, todas.map(w=>w.artista), n, perto), { imagem:true });
+        return mk(`Quem ${Acervo.verboDe(o)} esta obra?`, o.artista, distratores(o.artista, todas.map(w=>w.artista), n, perto), { imagem:true });
       }
       case "zoom": {
         const perto = todas.filter(w=>w.pais===o.pais || (o.movimento && w.movimento===o.movimento)).map(w=>w.artista);
-        return mk("Que artista pintou esta obra? (a imagem vai se revelando)", o.artista, distratores(o.artista, todas.map(w=>w.artista), n, perto),
+        return mk(`Que artista ${Acervo.verboDe(o)} esta obra? (a imagem vai se revelando)`, o.artista, distratores(o.artista, todas.map(w=>w.artista), n, perto),
           { imagem:true, revela:novaRevelacao() });
       }
       case "titulo": {
@@ -163,7 +163,7 @@ const Perguntas = {
       case "cidade": {
         if(!o.rica || !o.cidade) return null;
         const pool = ricas.map(w=>w.cidade).concat(CIDADES_ARTE);
-        return mk("Esta obra está ligada a qual cidade?", o.cidade, distratores(o.cidade, pool, n), { imagem:true, dica:"cidade onde foi pintada ou onde está hoje" });
+        return mk("Esta obra está ligada a qual cidade?", o.cidade, distratores(o.cidade, pool, n), { imagem:true, dica:"cidade onde foi criada ou onde está hoje" });
       }
       case "museu": {
         if(!o.rica || !o.museu) return null;

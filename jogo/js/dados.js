@@ -92,8 +92,22 @@ const Acervo = {
     });
   },
 
+  /* tipo da obra a partir da técnica/título: escultura, desenho ou pintura (define o verbo das perguntas) */
+  tipoDe(o){
+    const t = this.norm((o.tecnica||"")), ti = this.norm(o.titulo||"");
+    if(/escultur|relevo|talha|estatua|busto|bronze|marmore|pedra.sabao|terracota|ceramica|esteatita/.test(t)) return "escultura";
+    if(/desenho|esboco|nanquim|carvao|grafite|sanguinea|gravura|agua.forte|litografia|pastel|caneta|tinta ferrosa/.test(t)) return "desenho";
+    if(!t && o.artista === "Aleijadinho") return "escultura";
+    if(!t && /^(estudo|study|drawing|sketch|desenho|manuscript)/.test(ti)) return "desenho";
+    return "pintura";
+  },
+  verboDe(o, forma){   // forma: "v" (pintou) | "p" (pintada)
+    const m = { escultura:["esculpiu","esculpida"], desenho:["desenhou","desenhada"], pintura:["pintou","pintada"] }[o.tipo || "pintura"];
+    return forma === "p" ? m[1] : m[0];
+  },
   adicionar(o){
     if(!PAISES[o.pais]) return;
+    o.tipo = this.tipoDe(o);
     this.obras.push(o); this.porId[o.id] = o;
   },
 

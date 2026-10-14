@@ -155,8 +155,8 @@ function renderPintores(){
   const q = Acervo.norm(filtroPintor);
   if(q) lista = lista.filter(a=>Acervo.norm(a.nome).includes(q));
   const todas = listaPintores(), jogaveis = todas.filter(a=>a.obras.length>=3).length;
-  el.innerHTML = `<h2 class="sec">Pintores</h2><p class="sub">${jogaveis} artistas para conhecer. Toque no quadro para ler a biografia e seguir o jogo.</p>
-    <input class="busca" id="busca-pintor" placeholder="Buscar pintor..." value="${escapeAttr(filtroPintor)}">
+  el.innerHTML = `<h2 class="sec">Artistas</h2><p class="sub">${jogaveis} artistas para conhecer. Toque no quadro para ler a biografia e seguir o jogo.</p>
+    <input class="busca" id="busca-pintor" placeholder="Buscar artista..." value="${escapeAttr(filtroPintor)}">
     <div class="galeria">${lista.map((a,i)=>{
       const inf = PINTORES_INFO[a.nome] || {}, dom = Prog.dominioPintor(a.nome), vistas = a.obras.filter(o=>Prog.P.vistas[o.id]).length;
       return `<button class="quadro ${a.obras.length?"":"vazio"}" data-n="${escapeAttr(a.nome)}">
@@ -201,7 +201,7 @@ let mestreAberto = null;
 function renderMestres(){
   const el = $("v-mestres");
   if(!mestreAberto){
-    el.innerHTML = `<h2 class="sec">Mestres</h2><p class="sub">Trilhas com a vida e a obra de grandes pintores: capítulos, linha do tempo, obras e curiosidades. Cada capítulo concluído libera o próximo.</p>
+    el.innerHTML = `<h2 class="sec">Mestres</h2><p class="sub">Trilhas com a vida e a obra de grandes artistas: capítulos, linha do tempo, obras e curiosidades. Cada capítulo concluído libera o próximo.</p>
       <div class="cn-atalhos"><button class="chip" id="guia-arte">📘 Guia de arte <small>${Conceitos.totalVistos()}/${Conceitos.lista.length}</small></button><button class="chip" id="praticar-cn">🧠 Praticar conceitos</button></div>
       ${Mestres.lista.map(t=>{ const c = t.cfg, n = t.capitulos.length, h = c.hero;
         return `<button class="vg-heroi" data-m="${c.id}" style="display:block;width:100%;text-align:left;background:${h.fundo}"><div class="hero-topo"><div class="hero-ret moldura">${retratoHtml(c.artista)}</div><h2 style="color:${h.cor}">${c.nome}</h2></div><p>${h.texto}</p>

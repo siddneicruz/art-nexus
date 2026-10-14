@@ -120,7 +120,7 @@ class Trilha {
       out.push({ tipo:"vg-obra", texto:`Qual é o título desta obra de ${nomeCurto}?`, certa:o.titulo,
         opcoes:embaralhar([o.titulo, ...embaralhar(titulosCompativeis(o.titulo, todos.filter(x=>x.id!==id).map(x=>x.titulo))).slice(0,n)]),
         custom:true, obra:o, imagem:true, longo:true, detalhe:`${o.titulo}${extra ? " — "+extra : ""}` });
-      if(g.ano) out.push({ tipo:"vg-obra", texto:`Em que ano ${nomeCurto} ${verbo} esta obra?`, certa:String(g.ano),
+      if(g.ano) out.push({ tipo:"vg-obra", texto:`Em que ano ${nomeCurto} ${o.tipo && o.tipo !== "pintura" ? Acervo.verboDe(o) : verbo} esta obra?`, certa:String(g.ano),
         opcoes:embaralhar([String(g.ano), ...this.anosProximos(g.ano, n).map(String)]),
         custom:true, obra:o, imagem:true, detalhe:`${o.titulo} é de ${g.ano}.` });
       if(g.fase) out.push({ tipo:"vg-obra", texto:this.cfg.textoFase, certa:g.fase,
