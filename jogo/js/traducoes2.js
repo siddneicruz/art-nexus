@@ -422,6 +422,12 @@ Object.assign(TRAD_TITULOS, {
 
 /* títulos originais (idioma da obra) de itens já traduzidos no banco */
 const ORIG_POR_ID = {
+"cloud-aa42c79d96": "Portrait de M. et Mme Auguste Manet",
+"cloud-5e221b7eb6": "Le Buveur d'absinthe",
+"cloud-70dfd7597e": "Le Chanteur espagnol",
+"cloud-61854b2e89": "Olympia",
+"cloud-0ad12f2acf": "Le Déjeuner sur l'herbe",
+"cloud-16c404fde1": "Le Fifre",
 "cloud-bfc31d76a6": "La pesca miracolosa",
 "cloud-4cd3b87cfa": "La Resurrezione di Cristo",
 "cloud-70876ae758": "Sacra Famiglia Canigiani",
