@@ -129,9 +129,6 @@ class Trilha {
       if(g.onde && ondes.length > n) out.push({ tipo:"vg-obra", texto:"Onde esta obra está hoje?", certa:g.onde,
         opcoes:embaralhar([g.onde, ...embaralhar(ondes.filter(x=>x!==g.onde)).slice(0,n)]),
         custom:true, obra:o, imagem:true, longo:true, detalhe:`${o.titulo} está em ${g.onde}.` });
-      if(g.tecnica && tecnicas.length > n) out.push({ tipo:"vg-obra", texto:"Qual é a técnica desta obra?", certa:g.tecnica,
-        opcoes:embaralhar([g.tecnica, ...embaralhar(tecnicas.filter(x=>x!==g.tecnica)).slice(0,n)]),
-        custom:true, obra:o, imagem:true, longo:true, detalhe:`${o.titulo}: ${g.tecnica}.` });
     });
     return out.filter(q=>q.opcoes.length >= 3);   // título sem opções compatíveis é descartado
   }

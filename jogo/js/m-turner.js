@@ -43,7 +43,7 @@ Mestres.registrar({
     { ano:1829, cap:"maturidade", curto:"Morre o pai",                       q:"Em que ano morreu o pai de Turner?" },
     { ano:1834, cap:"maturidade", curto:"Estudos do incêndio do Parlamento", q:"Em que ano ocorreu o incêndio do Parlamento que Turner estudou em aquarelas?" },
     { ano:1835, cap:"maturidade", curto:"Expõe Veneza, do Pórtico da Salute", q:"Em que ano Turner expôs Veneza, do Pórtico da Madonna della Salute?" },
-    { ano:1838, cap:"maturidade", curto:"Pinta o Temeraire",                 q:"Em que ano Turner pintou The Fighting Temeraire?" },
+    { ano:1838, cap:"maturidade", curto:"Pinta o Temeraire",                 q:"Em que ano Turner pintou O Temerário?" },
     { ano:1840, cap:"veneza",     curto:"Pinta O Navio Negreiro",            q:"Em que ano Turner pintou O Navio Negreiro?" },
     { ano:1843, cap:"veneza",     curto:"Sai Modern Painters, de Ruskin",    q:"Em que ano saiu o primeiro volume de Modern Painters, de Ruskin?" },
     { ano:1844, cap:"veneza",     curto:"Expõe Chuva, Vapor e Velocidade",   q:"Em que ano Turner expôs Chuva, Vapor e Velocidade?" },
@@ -103,7 +103,7 @@ Mestres.registrar({
       { t:"obra", q:"Qual destas obras Turner pintou com cena bíblica das pragas do Egito?", c:"A Quinta Praga do Egito", e:["Uma Grande Árvore","Londres vista de Greenwich","Pescadores no Mar","O Canal de Chichester"], d:"É de 1800." },
     ],
     maturidade:[
-      { t:"obra", q:"Qual obra de Turner mostra um navio rebocado para ser desmontado?", c:"The Fighting Temeraire", e:["O Navio Negreiro","O Incêndio do Parlamento","Glauco e Cila","Pescadores no Mar"], d:"Pintada em 1838, está na National Gallery, em Londres." },
+      { t:"obra", q:"Qual obra de Turner mostra um navio rebocado para ser desmontado?", c:"O Temerário", e:["O Navio Negreiro","O Incêndio do Parlamento","Glauco e Cila","Pescadores no Mar"], d:"Pintada em 1838, está na National Gallery, em Londres." },
       { t:"obra", q:"Que acontecimento levou Turner a fazer estudos em aquarela em 1834?", c:"O incêndio do Parlamento", e:["Um naufrágio","A coroação do rei","A morte de Reynolds","Uma tempestade em Veneza"], d:"Ele presenciou o fogo." },
       { t:"obra", q:"O que foi o Liber Studiorum, que Turner publicou a partir de 1807?", c:"Uma série de gravuras de paisagem", e:["Um diário de viagens","Um tratado de arquitetura","Um catálogo de leilão","Um livro de poemas"], d:"Saiu em partes entre 1807 e 1819." },
       { t:"obra", q:"O que foi a série Portos da Inglaterra, de 1826–28?", c:"Aquarelas feitas para serem gravadas", e:["Retratos de almirantes","Esculturas em bronze","Afrescos de igreja","Mapas náuticos"], d:"Mostra a costa inglesa em vistas de portos." },
@@ -132,7 +132,7 @@ Mestres.registrar({
       { t:"vida", q:"Para quem Turner legou suas telas acabadas?", c:"Para a nação britânica", e:["Para a Igreja","Para Monet","Para a França","Para a família"], d:"Queria que ficassem juntas numa galeria própria, o que não aconteceu." },
       { t:"vida", q:"Que galeria abriu em 1987 para abrigar o legado de Turner?", c:"A Clore Gallery, na Tate", e:["A Kimbell","A Duveen","A Sandycombe","A Winsor"], d:"Alguns quadros-chave ficaram na National Gallery." },
       { t:"vida", q:"Qual prêmio de arte contemporânea, criado em 1984, leva o nome de Turner?", c:"O Prêmio Turner", e:["A Medalha Reynolds","O Prêmio Monet","O Prêmio Ruskin","O Prêmio Tate"], d:"Prêmio britânico." },
-      { t:"obra", q:"Qual obra foi eleita em 2005, numa votação da BBC, a maior pintura da Grã-Bretanha?", c:"The Fighting Temeraire", e:["O Navio Negreiro","Giudecca","Glauco e Cila","O Incêndio do Parlamento"], d:"Hoje está na National Gallery." },
+      { t:"obra", q:"Qual obra foi eleita em 2005, numa votação da BBC, a maior pintura da Grã-Bretanha?", c:"O Temerário", e:["O Navio Negreiro","Giudecca","Glauco e Cila","O Incêndio do Parlamento"], d:"Hoje está na National Gallery." },
     ],
   },
   estilo:[

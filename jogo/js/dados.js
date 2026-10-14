@@ -118,6 +118,9 @@ const Acervo = {
     let n = 0;
     (linhas||[]).forEach(r=>{
       if(!r || !r.id || !r.artista || !r.imagem || r.duplicada || this.porId[r.id]) return;
+      // títulos vindos da Wikimedia com o rótulo em português embutido: 'Saint Anthony… label QS:Lpt,"Santo Antônio"'
+      const pt = /label QS:Lpt,"([^"]+)"/.exec(r.titulo || "") || /label QS Lpt\s+(.+)$/.exec(r.titulo || "");
+      if(pt) r = { ...r, titulo:pt[1].trim() };
       if(typeof TRAD_TITULOS !== "undefined" && TRAD_TITULOS[r.titulo]) r = { ...r, titulo:TRAD_TITULOS[r.titulo] };
       const chaves = this.chavesDe(r.titulo, r.imagem).map(k=>this.norm(r.artista)+"|"+k);
       if(chaves.some(k=>jaTem.has(k))) return;     // mesma obra já presente (título em outro idioma, arquivo repetido...)

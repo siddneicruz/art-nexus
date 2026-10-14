@@ -14,10 +14,10 @@ const NIVEIS = {
 };
 // peso de cada tipo por nível (0 = não aparece)
 const PESOS = {
-  iniciante:    { autor:4, titulo:3, zoom:3, movimento:2, seculo:3, tecnica:2, cidade:2, fato:3 },
-  intermediario:{ autor:3, titulo:3, zoom:3, movimento:3, decada:3, tecnica:3, cidade:3, museu:2, fato:3, cronologia:2 },
-  avancado:     { autor:2, titulo:3, zoom:3, movimento:3, decada:3, tecnica:3, cidade:3, museu:3, fato:4, cronologia:3, edeste:2 },
-  especialista: { autor:2, titulo:3, zoom:3, movimento:3, ano:4, tecnica:3, cidade:3, museu:3, fato:4, cronologia:4, edeste:2 },
+  iniciante:    { autor:4, titulo:3, zoom:3, movimento:2, seculo:3, cidade:2, fato:3 },
+  intermediario:{ autor:3, titulo:3, zoom:3, movimento:3, decada:3, cidade:3, museu:2, fato:3, cronologia:2 },
+  avancado:     { autor:2, titulo:3, zoom:3, movimento:3, decada:3, cidade:3, museu:3, fato:4, cronologia:3, edeste:2 },
+  especialista: { autor:2, titulo:3, zoom:3, movimento:3, ano:4, cidade:3, museu:3, fato:4, cronologia:4, edeste:2 },
 };
 const ROMANOS = ["","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];
 const CIDADES_ARTE = ["Paris","Florença","Roma","Veneza","Madri","Amsterdã","Londres","Viena","Berlim","Milão","Haia","Bruges","Antuérpia","Toledo","Sevilha","Munique","Dresden","Barcelona","Nova York","Delft"];
