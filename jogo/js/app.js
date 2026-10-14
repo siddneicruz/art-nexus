@@ -271,16 +271,25 @@ function renderPerfil(){
     ${blocoAptidao(P)}
     <div class="sep">Países</div>
     ${Object.entries(PAISES).map(([n,p])=>{ const x = P.paises[n]||{}; return `<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px"><span>${p.flag} ${n}</span><span>${estrelasHtml(x.estrelas||0)} <small style="color:var(--dim);margin-left:6px">${Prog.dominioPais(n)}%</small></span></div>`; }).join("")}
+    <div class="sep">Sincronização</div>
+    <div class="card" id="sync-card"><p class="sub" style="margin:0 0 8px">Seu código: <b id="sync-cod" style="letter-spacing:1px">${typeof Sync!=="undefined"?Sync.codigo:""}</b></p>
+      <p class="sub" style="margin:0 0 8px">Use o mesmo código em outro aparelho para continuar de onde parou. Guarde-o: quem tiver o código acessa seu progresso.</p>
+      <p class="sub" id="sync-msg" style="margin:0 0 8px">${typeof Sync!=="undefined"&&Sync.ult?`Última sincronização: ${Sync.ult}`:"Ainda não sincronizado."}</p>
+      <div class="pb-btns"><button class="btn ouro" id="sync-agora">Sincronizar agora</button></div>
+      <div style="display:flex;gap:6px;margin-top:8px"><input id="sync-in" placeholder="Código de outro aparelho" style="flex:1;min-width:0;padding:9px;border-radius:10px;border:1px solid var(--line);background:transparent;color:inherit"><button class="btn" id="sync-usar">Usar</button></div></div>
     <div class="sep">Medalhas</div>
     <div class="medalhas">${MEDALHAS.map(m=>`<div class="medalha ${P.medalhas[m.id]?"ok":""}" title="${m.desc}"><b>${m.icone}</b>${m.nome}</div>`).join("")}</div>
     <div class="sep">Álbum · ${vistas.length} obras conhecidas</div>
     ${vistas.length ? `<div class="album">${vistas.slice(-40).reverse().map(o=>`<img src="${Acervo.imgSrc(o)}" data-id="${o.id}" alt="" loading="lazy">`).join("")}</div>` : `<p class="sub">Acerte perguntas para completar seu álbum.</p>`}`;
   el.querySelectorAll(".album img").forEach(i=>i.addEventListener("click", ()=>abrirFicha(Acervo.porId[i.dataset.id])));
+  const sm = $("sync-msg"), sa = $("sync-agora"), su = $("sync-usar");
+  if(sa) sa.onclick = async ()=>{ sm.textContent = "Sincronizando…"; await Sync.sincronizar(false); renderPerfil(); const m2 = $("sync-msg"); if(m2) m2.textContent = Sync.msg + (Sync.ult ? " · "+Sync.ult : ""); };
+  if(su) su.onclick = async ()=>{ sm.textContent = "Sincronizando…"; const ok = await Sync.usarCodigo($("sync-in").value); renderPerfil(); const m2 = $("sync-msg"); if(m2) m2.textContent = Sync.msg; };
 }
 
 /* ---------------- início ---------------- */
 async function iniciar(){
-  Acervo.iniciar(); Prog.carregar();
+  Acervo.iniciar(); Prog.carregar(); if(typeof Sync!=="undefined") Sync.iniciar();
   // música das exposições: começa no primeiro toque (o navegador exige um gesto); preferência de silêncio fica salva
   try{ Musica.mudo = localStorage.getItem("artnexus_mudo")==="1"; }catch(e){}
   atualizarControleMusica();
