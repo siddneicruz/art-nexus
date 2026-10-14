@@ -288,8 +288,24 @@ function renderPerfil(){
 }
 
 /* ---------------- início ---------------- */
+function abrirSync(){
+  if(typeof Sync==="undefined") return;
+  const m = $("modal");
+  m.innerHTML = `<div class="caixa" style="padding:18px"><h3 style="margin-top:0">☁ Sincronizar progresso</h3>
+    <p class="sub">Seu código: <b style="letter-spacing:1px">${Sync.codigo}</b></p>
+    <p class="sub">Digite o mesmo código em outro aparelho para continuar de onde parou. Guarde-o: quem tiver o código acessa seu progresso.</p>
+    <p class="sub" id="sy-msg">${Sync.ult ? "Última sincronização: "+Sync.ult : "Ainda não sincronizado."}</p>
+    <div class="pb-btns"><button class="btn ouro" id="sy-agora">Sincronizar agora</button></div>
+    <div style="display:flex;gap:6px;margin-top:10px"><input id="sy-in" placeholder="Código de outro aparelho" style="flex:1;min-width:0;padding:9px;border-radius:10px;border:1px solid var(--line);background:transparent;color:inherit"><button class="btn" id="sy-usar">Usar</button></div>
+    <div class="pb-btns" style="margin-top:12px"><button class="btn ghost" id="sy-fechar">Fechar</button></div></div>`;
+  m.classList.add("aberto");
+  m.onclick = e => { if(e.target===m || e.target.id==="sy-fechar") m.classList.remove("aberto"); };
+  const msg = t => { const e = $("sy-msg"); if(e) e.textContent = t; };
+  $("sy-agora").onclick = async ()=>{ msg("Sincronizando…"); await Sync.sincronizar(false); msg(Sync.msg + (Sync.ult ? " · "+Sync.ult : "")); if(Prog.P) { try{ renderPerfil(); }catch(e){} } };
+  $("sy-usar").onclick = async ()=>{ msg("Sincronizando…"); await Sync.usarCodigo($("sy-in").value); msg(Sync.msg); try{ renderPerfil(); }catch(e){} };
+}
 async function iniciar(){
-  Acervo.iniciar(); Prog.carregar(); if(typeof Sync!=="undefined") Sync.iniciar();
+  Acervo.iniciar(); Prog.carregar(); if(typeof Sync!=="undefined") Sync.iniciar(); const bs = $("btn-sync"); if(bs) bs.onclick = ()=>{ AudioFX.click(); abrirSync(); };
   // música das exposições: começa no primeiro toque (o navegador exige um gesto); preferência de silêncio fica salva
   try{ Musica.mudo = localStorage.getItem("artnexus_mudo")==="1"; }catch(e){}
   atualizarControleMusica();
