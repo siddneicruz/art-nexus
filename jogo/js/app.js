@@ -175,14 +175,14 @@ function abrirPintor(nome){
   const px = Prog.P.pintores[nome] || { acertos:0, total:0 }, prec = px.total ? Math.round(100*px.acertos/px.total) : 0;
   const trilha = Mestres.lista.find(t=>t.cfg.artista===nome);
   const jogavel = a.obras.length >= 3;
-  const amostra = a.obras.filter(o=>!Prog.P.vistas[o.id]).slice(0,3).concat(a.obras.filter(o=>Prog.P.vistas[o.id]).slice(0,3)).slice(0,6);
+  const amostra = a.obras;
   const m = $("modal");
   m.innerHTML = `<div class="caixa pintor-bio">
     <div class="pb-topo"><div class="moldura grande">${retratoHtml(nome)}</div>
       <div><h3>${nome}</h3>${inf.orig && inf.orig !== nome ? `<div class="orig">${inf.orig}</div>` : ""}<div class="art">${[inf.anos, inf.nac].filter(Boolean).join(" · ")}</div>${inf.mov ? `<span class="tag">${inf.mov}</span>` : ""}</div></div>
     <p class="pb-bio">${inf.bio || "Biografia em breve."}</p>
     <div class="evolucao grande"><div class="barra"><i style="width:${dom}%"></i></div><small>Evolução ${dom}% · ${vistas} de ${a.obras.length} obras conhecidas${px.total ? ` · ${prec}% de acertos` : ""}</small></div>
-    ${amostra.length ? `<div class="cn-tit" style="margin-top:12px">Obras no acervo</div><div class="album" id="pb-obras">${amostra.map(o=>`<img src="${Acervo.imgSrc(o)}" data-id="${o.id}" alt="" loading="lazy">`).join("")}</div>` : `<p class="art" style="margin-top:12px">As obras deste artista ainda estão a caminho do acervo.</p>`}
+    ${amostra.length ? `<div class="cn-tit" style="margin-top:12px">Todas as obras · ${a.obras.length}</div><div class="album rolagem" id="pb-obras">${a.obras.map(o=>`<img src="${Acervo.imgSrc(o)}" data-id="${o.id}" alt="" loading="lazy">`).join("")}</div>` : `<p class="art" style="margin-top:12px">As obras deste artista ainda estão a caminho do acervo.</p>`}
     <div class="pb-btns">
       <button class="btn ouro" id="pb-jogar" ${jogavel?"":"disabled"}>${vistas ? "Seguir o jogo" : "Começar a jogar"}</button>
       ${trilha ? `<button class="btn" id="pb-trilha">Trilha de vida e obra</button>` : ""}
