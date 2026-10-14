@@ -216,7 +216,7 @@ const Jogo = {
         ${novidades.medalhas.map(m=>`<div class="novidade">${m.icone} Medalha: <b>${m.nome}</b> — ${m.desc}</div>`).join("")}
         ${this.blocoVG(estrelas)}
         <h3 class="res-sec">${vistas.length ? "O que você viu" : ""}</h3>
-        <div class="res-obras">${vistas.map((o,i)=>`<button class="res-obra" data-i="${i}"><img src="${Acervo.imgSrc(o)}" alt=""><span><b>${o.titulo||"Obra sem título"}</b><small>${o.artista}</small></span></button>`).join("")}</div>
+        <div class="res-obras">${vistas.map((o,i)=>`<button class="res-obra" data-i="${i}"><img src="${Acervo.imgSrc(o)}" alt=""><span><b>${o.titulo||"Obra sem título"}</b><small>${o.tituloOrig && o.tituloOrig !== o.titulo ? o.tituloOrig+" · " : ""}${o.artista}</small></span></button>`).join("")}</div>
         <div class="jg-fb-btns" style="justify-content:center;margin-top:18px">
           <button class="btn ouro" id="res-de-novo">Jogar de novo</button>
           <button class="btn ghost" id="res-voltar">Voltar</button>

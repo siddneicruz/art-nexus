@@ -419,3 +419,24 @@ Object.assign(TRAD_TITULOS, {
 "Prophet Jeremiah": "Profeta Jeremias",
 "Prophet Jonah": "Profeta Jonas"
 });
+
+/* títulos originais (idioma da obra) de itens já traduzidos no banco */
+const ORIG_POR_ID = {
+"cloud-bfc31d76a6": "La pesca miracolosa",
+"cloud-4cd3b87cfa": "La Resurrezione di Cristo",
+"cloud-70876ae758": "Sacra Famiglia Canigiani",
+"cloud-14bec40f14": "Le tre Grazie",
+"cloud-1c7fadb758": "Deposizione di Cristo (Pala Baglioni)",
+"cloud-2da1de628e": "La scuola di Atene",
+"cloud-46b8eab7d7": "La scuola di Atene (dettaglio)",
+"cloud-8e56aef12c": "Ritratto di Francesco Maria della Rovere",
+"cloud-fe322b3188": "La Fornarina",
+"cloud-ed8999f83a": "Incontro di Leone Magno con Attila",
+"cloud-f10f4bf349": "Madonna col Bambino in trono e santi",
+"cloud-62612ecdf5": "Madonna Sistina (dettaglio)",
+"cloud-f228e52ee7": "La Messa di Bolsena",
+"cloud-012ae59e24": "Ritratto di Maddalena Doni",
+"cloud-55fbe3b5cd": "Incendio di Borgo",
+"cloud-766b61fcdd": "Allegoria della Virtù (Stanza della Segnatura)",
+"cloud-5b7c40e0ed": "Trasfigurazione"
+};

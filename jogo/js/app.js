@@ -39,6 +39,7 @@ function abrirFicha(o){
   m.innerHTML = `<div class="caixa">
     <img src="${Acervo.imgSrc(o)}" alt="">
     <h3>${o.titulo || "Obra sem título"}</h3>
+    ${o.tituloOrig && o.tituloOrig !== o.titulo ? `<div class="orig">${o.tituloOrig}</div>` : ""}
     <div class="art">${o.artista} · ${PAISES[o.pais] ? PAISES[o.pais].flag+" " : ""}${o.pais}</div>
     ${meta ? `<p>${meta}</p>` : ""}
     ${g && g.fase ? `<p>🖌 Fase: ${g.fase}</p>` : ""}
@@ -178,7 +179,7 @@ function abrirPintor(nome){
   const m = $("modal");
   m.innerHTML = `<div class="caixa pintor-bio">
     <div class="pb-topo"><div class="moldura grande">${retratoHtml(nome)}</div>
-      <div><h3>${nome}</h3><div class="art">${[inf.anos, inf.nac].filter(Boolean).join(" · ")}</div>${inf.mov ? `<span class="tag">${inf.mov}</span>` : ""}</div></div>
+      <div><h3>${nome}</h3>${inf.orig && inf.orig !== nome ? `<div class="orig">${inf.orig}</div>` : ""}<div class="art">${[inf.anos, inf.nac].filter(Boolean).join(" · ")}</div>${inf.mov ? `<span class="tag">${inf.mov}</span>` : ""}</div></div>
     <p class="pb-bio">${inf.bio || "Biografia em breve."}</p>
     <div class="evolucao grande"><div class="barra"><i style="width:${dom}%"></i></div><small>Evolução ${dom}% · ${vistas} de ${a.obras.length} obras conhecidas${px.total ? ` · ${prec}% de acertos` : ""}</small></div>
     ${amostra.length ? `<div class="cn-tit" style="margin-top:12px">Obras no acervo</div><div class="album" id="pb-obras">${amostra.map(o=>`<img src="${Acervo.imgSrc(o)}" data-id="${o.id}" alt="" loading="lazy">`).join("")}</div>` : `<p class="art" style="margin-top:12px">As obras deste artista ainda estão a caminho do acervo.</p>`}

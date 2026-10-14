@@ -119,9 +119,11 @@ const Acervo = {
     (linhas||[]).forEach(r=>{
       if(!r || !r.id || !r.artista || !r.imagem || r.duplicada || this.porId[r.id]) return;
       // títulos vindos da Wikimedia com o rótulo em português embutido: 'Saint Anthony… label QS:Lpt,"Santo Antônio"'
+      let tituloOrig = String(r.titulo || "");
       const pt = /label QS:Lpt,"([^"]+)"/.exec(r.titulo || "") || /label QS Lpt\s+(.+)$/.exec(r.titulo || "");
-      if(pt) r = { ...r, titulo:pt[1].trim() };
-      if(typeof TRAD_TITULOS !== "undefined" && TRAD_TITULOS[r.titulo]) r = { ...r, titulo:TRAD_TITULOS[r.titulo] };
+      if(pt){ let e = tituloOrig.split(/\s*label QS/)[0].trim(); const h = e.length / 2; if(h > 3 && e.slice(0, h) === e.slice(h)) e = e.slice(0, h); tituloOrig = e; r = { ...r, titulo:pt[1].trim() }; }
+      if(typeof TRAD_TITULOS !== "undefined" && TRAD_TITULOS[r.titulo]){ tituloOrig = r.titulo; r = { ...r, titulo:TRAD_TITULOS[r.titulo] }; }
+      if(typeof ORIG_POR_ID !== "undefined" && ORIG_POR_ID[r.id]) tituloOrig = ORIG_POR_ID[r.id];
       const chaves = this.chavesDe(r.titulo, r.imagem).map(k=>this.norm(r.artista)+"|"+k);
       if(chaves.some(k=>jaTem.has(k))) return;     // mesma obra já presente (título em outro idioma, arquivo repetido...)
       chaves.forEach(k=>jaTem.add(k));
@@ -130,7 +132,7 @@ const Acervo = {
       this.adicionar({
         id:String(r.id), titulo:this.tituloLimpo(r.titulo, r.artista) || (r.titulo||""), tituloOk:!!this.tituloLimpo(r.titulo, r.artista),
         artista:r.artista, pais:r.pais, movimento:r.movimento || "", ano:a.ano, anoPreciso:a.preciso, anoTxt:r.data_obra || "",
-        tecnica:tec, cidade:this.cidadeDe(r.local), localTxt:r.local || "", museu:this.museuLimpo(r.museu), fatos:[], imagem:this.urlDoBucket(r.imagem), tier:r.tier || 3, rica, nuvem:true,
+        tecnica:tec, cidade:this.cidadeDe(r.local), localTxt:r.local || "", museu:this.museuLimpo(r.museu), fatos:[], imagem:this.urlDoBucket(r.imagem), tier:r.tier || 3, rica, nuvem:true, tituloOrig,
       });
       n++;
     });

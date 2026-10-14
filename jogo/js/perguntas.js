@@ -200,7 +200,7 @@ const Perguntas = {
     const o = q.obra, p = [];
     if(q.semObra){ return q.detalhe; }
     if(q.custom){ return q.detalhe + (o && o.titulo ? `<br>🖼 <b>${o.titulo}</b>${o.anoTxt ? " · "+o.anoTxt : ""}` : ""); }
-    p.push(`<b>${o.titulo}</b> — ${o.artista} (${PAISES[o.pais].flag} ${o.pais})`);
+    p.push(`<b>${o.titulo}</b>${o.tituloOrig && o.tituloOrig !== o.titulo ? ` <i>(${o.tituloOrig})</i>` : ""} — ${o.artista} (${PAISES[o.pais].flag} ${o.pais})`);
     const meta = [o.anoTxt && o.rica ? o.anoTxt : "", o.movimento, o.tecnica].filter(Boolean).join(" · ");
     if(meta) p.push(meta);
     if(q.detalhe) p.push(q.detalhe);

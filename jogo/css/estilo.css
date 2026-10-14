@@ -248,3 +248,5 @@ p.sub{font-size:13.5px}
 .hero-topo h2{margin:0}
 .hero-ret.moldura{width:56px;flex:0 0 auto;padding:3px;border-radius:12px}
 .hero-ret .ret{aspect-ratio:1;border-radius:9px}.hero-ret .ret .mono{font-size:20px}.hero-ret.moldura::after{inset:3px;border-radius:9px}
+
+.orig{font-style:italic;color:var(--mute,#a59a86);font-size:.85rem;margin:-2px 0 6px}
